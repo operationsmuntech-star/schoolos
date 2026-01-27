@@ -176,8 +176,16 @@ STATICFILES_DIRS = [BASE_DIR / 'static']  # Development: served by Django direct
 if DEBUG:
     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 else:
-    # Use basic WhiteNoise storage instead of manifest-based to avoid MIME type issues
+    # Use basic WhiteNoise storage with autorefresh for dynamic file serving
     STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
+    WHITENOISE_AUTOREFRESH = True
+    WHITENOISE_USE_FINDERS = True
+
+# Staticfiles finders for locating CSS, JS, images
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+]
 
 # Media files (User uploads)
 MEDIA_URL = '/media/'
