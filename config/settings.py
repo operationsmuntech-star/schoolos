@@ -23,6 +23,7 @@ else:
         'localhost',
         '127.0.0.1',
         '*.railway.app',
+        '*.up.railway.app',
         os.getenv('RAILWAY_DOMAIN', 'localhost'),
         'yourdomain.com',
         'www.yourdomain.com',
