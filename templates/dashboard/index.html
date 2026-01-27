@@ -3,38 +3,272 @@
 {% block title %}Dashboard - MunTech{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Dashboard</h1>
-</div>
+<div class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-800 mb-2" style="font-size: 2.5rem;">Dashboard</h1>
+            <p class="text-secondary mb-0">Welcome back! Here's what's happening in your school today.</p>
+        </div>
+        <button class="btn btn-premium" data-bs-toggle="modal" data-bs-target="#quickActionModal">
+            <i class="bi bi-plus-circle me-2"></i>Quick Action
+        </button>
+    </div>
 
-<div class="row">
-    <div class="col-md-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <h5>Total Students</h5>
-                <h2 class="text-primary">{{ total_students }}</h2>
+    <!-- PREMIUM STAT CARDS -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card slide-in-up">
+                <div class="stat-icon">👥</div>
+                <div class="stat-content">
+                    <div class="stat-label">Total Students</div>
+                    <div class="stat-value">{{ total_students|default:0 }}</div>
+                    <div class="stat-trend trend-up">
+                        <i class="bi bi-arrow-up-right"></i>12.5% this month
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card slide-in-up">
+                <div class="stat-icon">👨‍🏫</div>
+                <div class="stat-content">
+                    <div class="stat-label">Total Teachers</div>
+                    <div class="stat-value">{{ total_teachers|default:0 }}</div>
+                    <div class="stat-trend trend-neutral">
+                        <i class="bi bi-dash-lg"></i>No change
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card slide-in-up">
+                <div class="stat-icon">📚</div>
+                <div class="stat-content">
+                    <div class="stat-label">Classes</div>
+                    <div class="stat-value">24</div>
+                    <div class="stat-trend trend-up">
+                        <i class="bi bi-arrow-up-right"></i>2 new
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card slide-in-up">
+                <div class="stat-icon">✅</div>
+                <div class="stat-content">
+                    <div class="stat-label">Attendance Rate</div>
+                    <div class="stat-value">92%</div>
+                    <div class="stat-trend trend-up">
+                        <i class="bi bi-arrow-up-right"></i>+5%
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <h5>Total Teachers</h5>
-                <h2 class="text-success">{{ total_teachers }}</h2>
+
+    <!-- QUICK ACCESS MODULES -->
+    <h3 class="fw-700 mb-4">Quick Access</h3>
+    <div class="row g-3 mb-5">
+        <div class="col-md-4">
+            <a href="{% url 'admissions:index' %}" class="card glass-card text-decoration-none shadow-hover h-100">
+                <div class="card-body text-center py-5">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">📋</div>
+                    <h5 class="card-title">Admissions</h5>
+                    <p class="card-text text-secondary">Manage student applications and enrollment</p>
+                    <div class="mt-3">
+                        <span class="badge bg-gradient-premium">View</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a href="{% url 'attendance:index' %}" class="card glass-card text-decoration-none shadow-hover h-100">
+                <div class="card-body text-center py-5">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">✋</div>
+                    <h5 class="card-title">Attendance</h5>
+                    <p class="card-text text-secondary">Track daily class attendance</p>
+                    <div class="mt-3">
+                        <span class="badge bg-gradient-premium">View</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a href="{% url 'fees:index' %}" class="card glass-card text-decoration-none shadow-hover h-100">
+                <div class="card-body text-center py-5">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">💰</div>
+                    <h5 class="card-title">Fees Management</h5>
+                    <p class="card-text text-secondary">Handle fee payments and records</p>
+                    <div class="mt-3">
+                        <span class="badge bg-gradient-premium">View</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a href="{% url 'examinations:index' %}" class="card glass-card text-decoration-none shadow-hover h-100">
+                <div class="card-body text-center py-5">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">📝</div>
+                    <h5 class="card-title">Examinations</h5>
+                    <p class="card-text text-secondary">Manage exams and results</p>
+                    <div class="mt-3">
+                        <span class="badge bg-gradient-premium">View</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a href="{% url 'payments:index' %}" class="card glass-card text-decoration-none shadow-hover h-100">
+                <div class="card-body text-center py-5">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">💳</div>
+                    <h5 class="card-title">Payments</h5>
+                    <p class="card-text text-secondary">Process payment transactions</p>
+                    <div class="mt-3">
+                        <span class="badge bg-gradient-premium">View</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a href="#" class="card glass-card text-decoration-none shadow-hover h-100">
+                <div class="card-body text-center py-5">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">⚙️</div>
+                    <h5 class="card-title">Settings</h5>
+                    <p class="card-text text-secondary">Configure system preferences</p>
+                    <div class="mt-3">
+                        <span class="badge bg-gradient-premium">View</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- RECENT ACTIVITY -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card glass-card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-clock-history me-2"></i>Recent Activity
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="activity-item d-flex gap-3 pb-3 border-bottom">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #a855f7, #14b8a6); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; flex-shrink: 0;">
+                            📝
+                        </div>
+                        <div>
+                            <h6 class="mb-1">New student admission</h6>
+                            <p class="text-secondary text-small mb-0">John Doe has been admitted to Class 10A</p>
+                            <small class="text-tertiary">2 hours ago</small>
+                        </div>
+                    </div>
+                    <div class="activity-item d-flex gap-3 pb-3 border-bottom">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #10b981, #06b6d4); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; flex-shrink: 0;">
+                            ✅
+                        </div>
+                        <div>
+                            <h6 class="mb-1">Attendance marked</h6>
+                            <p class="text-secondary text-small mb-0">Class 10A attendance marked for today</p>
+                            <small class="text-tertiary">4 hours ago</small>
+                        </div>
+                    </div>
+                    <div class="activity-item d-flex gap-3">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #ef4444); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; flex-shrink: 0;">
+                            💰
+                        </div>
+                        <div>
+                            <h6 class="mb-1">Fee payment received</h6>
+                            <p class="text-secondary text-small mb-0">₹50,000 payment from Class 10A</p>
+                            <small class="text-tertiary">1 day ago</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card glass-card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-exclamation-circle me-2"></i>Quick Stats
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="fw-600">Attendance This Week</span>
+                            <span class="badge bg-success">92%</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: 92%"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="fw-600">Fee Collection</span>
+                            <span class="badge bg-info">78%</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-info" role="progressbar" style="width: 78%"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="fw-600">Exam Completion</span>
+                            <span class="badge bg-warning">45%</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: 45%"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row mt-4">
-    <div class="col-md-4">
-        <a href="{% url 'admissions:index' %}" class="btn btn-primary w-100">Admissions</a>
-    </div>
-    <div class="col-md-4">
-        <a href="{% url 'attendance:index' %}" class="btn btn-info w-100">Attendance</a>
-    </div>
-    <div class="col-md-4">
-        <a href="{% url 'fees:index' %}" class="btn btn-warning w-100">Fees</a>
-    </div>
-</div>
+<!-- CUSTOM STYLES FOR DASHBOARD -->
+<style>
+    .bg-gradient-premium {
+        background: linear-gradient(135deg, #a855f7, #14b8a6) !important;
+        color: white;
+    }
+    
+    .shadow-hover:hover {
+        box-shadow: 0 12px 48px rgba(0, 0, 0, 0.12) !important;
+    }
+    
+    .fw-800 {
+        font-weight: 800;
+    }
+    
+    .fw-700 {
+        font-weight: 700;
+    }
+    
+    .fw-600 {
+        font-weight: 600;
+    }
+    
+    .text-small {
+        font-size: 0.85rem;
+    }
+    
+    @media (prefers-reduced-motion: no-preference) {
+        .stat-card, .slide-in-up {
+            animation: slideInUp 0.6s ease-out;
+        }
+    }
+</style>
 {% endblock %}
