@@ -271,4 +271,6 @@ if DEBUG:
 else:
     X_FRAME_OPTIONS = 'SAMEORIGIN'
     SECURE_HSTS_SECONDS = 31536000
-    SECURE_SSL_REDIRECT = True
+    # Railway terminates SSL at load balancer; detect via X-Forwarded-Proto
+    SECURE_SSL_REDIRECT = False
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
