@@ -239,8 +239,13 @@ CSRF_TRUSTED_ORIGINS = [
     'https://*.ngrok.io',
     'https://*.ngrok.app',
     'https://*.railway.app',
-    os.getenv('RAILWAY_DOMAIN', '').replace('https://', ''),
-] if 'https://' not in os.getenv('RAILWAY_DOMAIN', '') else ['https://' + os.getenv('RAILWAY_DOMAIN', '').replace('https://', '')]
+]
+# Add Railway domain if provided
+railway_domain = os.getenv('RAILWAY_DOMAIN', '').strip()
+if railway_domain:
+    if not railway_domain.startswith('https://'):
+        railway_domain = 'https://' + railway_domain
+    CSRF_TRUSTED_ORIGINS.append(railway_domain)
 
 # CORS Configuration - Allow ngrok and localhost
 CORS_ALLOWED_ORIGINS = [
