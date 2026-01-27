@@ -12,7 +12,7 @@ dj-database-url==2.1.0
 # Frontend
 Pillow==10.1.0
 django-crispy-forms==2.1
-crispy-bootstrap5==2.0.2
+crispy-bootstrap5==2025.6
 
 # Authentication
 django-allauth==0.57.0
