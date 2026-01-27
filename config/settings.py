@@ -172,8 +172,12 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'  # Used for production with collectstatic
 STATICFILES_DIRS = [BASE_DIR / 'static']  # Development: served by Django directly
 
-# WhiteNoise compression for faster static file serving on Railway
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage' if not DEBUG else 'django.contrib.staticfiles.storage.StaticFilesStorage'
+# WhiteNoise static file serving (simpler storage for better Railway compatibility)
+if DEBUG:
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+else:
+    # Use basic WhiteNoise storage instead of manifest-based to avoid MIME type issues
+    STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
 
 # Media files (User uploads)
 MEDIA_URL = '/media/'

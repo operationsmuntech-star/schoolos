@@ -30,7 +30,7 @@ try:
     # Collect static files
     print("[MUNTECH] Collecting static files...")
     try:
-        call_command('collectstatic', verbosity=0, interactive=False, clear=True)
+        call_command('collectstatic', verbosity=0, interactive=False, clear=False)
         print(f"[MUNTECH] ✓ Static files collected to {STATICFILES_DIR}")
     except Exception as collect_err:
         print(f"[MUNTECH] ⚠ Collectstatic notice: {collect_err}", file=sys.stderr)
