@@ -4,9 +4,8 @@ Django==5.0.1
 python-dotenv==1.0.0
 
 # Database
-# Note: psycopg2-binary requires compilation on Windows.
-# For development, use SQLite (local). For production, Railway provides PostgreSQL.
-# If you need psycopg2 locally: use Windows PostgreSQL installer or conda.
+# psycopg2-binary works fine on Linux/Railway (Windows build issues are development-only)
+psycopg2-binary==2.9.11
 dj-database-url==2.1.0
 
 # Frontend
