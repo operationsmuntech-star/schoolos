@@ -19,15 +19,21 @@ DEBUG = os.getenv('DEBUG', 'True') == 'True'
 if DEBUG:
     ALLOWED_HOSTS = ['*']
 else:
+    # Base allowed hosts
     ALLOWED_HOSTS = [
         'localhost',
         '127.0.0.1',
+        'muntechschoolsys.up.railway.app',  # Explicit Railway domain
         '*.railway.app',
         '*.up.railway.app',
-        os.getenv('RAILWAY_DOMAIN', 'localhost'),
         'yourdomain.com',
         'www.yourdomain.com',
     ]
+    
+    # Add RAILWAY_DOMAIN env var if set
+    railway_domain = os.getenv('RAILWAY_DOMAIN', '').strip()
+    if railway_domain and railway_domain not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(railway_domain)
 
 # Application definition
 INSTALLED_APPS = [
