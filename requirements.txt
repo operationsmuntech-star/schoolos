@@ -1,0 +1,34 @@
+# Core Framework
+# Keep Django at current stable version for dev/test
+Django==5.0.1
+python-dotenv==1.0.0
+
+# Database
+# Note: psycopg2-binary requires compilation on Windows.
+# For development, use SQLite (local). For production, Railway provides PostgreSQL.
+# If you need psycopg2 locally: use Windows PostgreSQL installer or conda.
+dj-database-url==2.1.0
+
+# Frontend
+Pillow==10.1.0
+django-crispy-forms==2.1
+crispy-bootstrap5==2.0.2
+
+# Authentication
+django-allauth==0.57.0
+
+# Admin Interface
+django-grappelli==4.0.1
+
+# ngrok Tunneling
+pyngrok==5.1.0
+
+# Production Server
+gunicorn==21.2.0
+whitenoise==6.6.0
+
+# Development / CI tools
+black==23.9.1
+isort==5.12.0
+flake8==6.1.0
+pre-commit==3.4.0

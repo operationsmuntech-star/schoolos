@@ -1,0 +1,157 @@
+/* SCHOOL/static/css/style.css */
+
+/* ------------------------------------------------------------------
+   1. ROOT VARIABLES & THEME CONFIGURATION
+   ------------------------------------------------------------------ */
+:root {
+    /* Brand Colors */
+    --primary-color: #4f46e5; /* Updated to a more modern Indigo */
+    --primary-dark: #4338ca;
+    --secondary-color: #64748b;
+    --success-color: #10b981;
+    --danger-color: #ef4444;
+    --warning-color: #f59e0b;
+    --info-color: #3b82f6;
+    
+    /* Neutral Colors */
+    --light-color: #f8fafc;
+    --dark-color: #1e293b;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+
+    /* Typography */
+    --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    --base-font-size: 16px;
+    --line-height: 1.6;
+
+    /* Spacing & Effects */
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+    --transition-base: all 0.2s ease-in-out;
+}
+
+/* ------------------------------------------------------------------
+   2. GLOBAL RESET & BASE STYLES
+   ------------------------------------------------------------------ */
+html {
+    font-size: var(--base-font-size);
+    scroll-behavior: smooth;
+    height: 100%;
+}
+
+body {
+    font-family: var(--font-family);
+    line-height: var(--line-height);
+    color: var(--dark-color);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f1f5f9;
+    /* Removed the hardcoded background image here to let auth.css handle its own, 
+       or dashboard handle its own. */
+    overflow-x: hidden; /* Only hide horizontal overflow */
+    overflow-y: auto;   /* Allow vertical scrolling */
+}
+
+/* Main Layout Wrapper */
+main {
+    flex: 1;
+    position: relative;
+    z-index: 1; /* Ensures content sits above any background effects */
+}
+
+a { text-decoration: none; color: var(--primary-color); transition: var(--transition-base); }
+a:hover { color: var(--primary-dark); }
+
+/* ------------------------------------------------------------------
+   3. COMPONENTS
+   ------------------------------------------------------------------ */
+
+/* Cards */
+.card {
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    background: #fff;
+    transition: var(--transition-base);
+}
+
+.card-header {
+    background-color: transparent;
+    border-bottom: 1px solid var(--border-color);
+    padding: 1.5rem;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Hover Lift Effect */
+.hover-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md) !important;
+}
+
+/* Navbar */
+.navbar {
+    background-color: #ffffff;
+    box-shadow: var(--shadow-sm);
+    padding: 0.75rem 1rem;
+    z-index: 1030;
+    border-bottom: 1px solid var(--border-color);
+}
+.navbar-brand { 
+    font-weight: 700; 
+    color: var(--primary-color) !important; 
+    font-size: 1.25rem;
+}
+.navbar-dark .navbar-nav .nav-link {
+    color: var(--secondary-color);
+}
+.navbar-dark .navbar-nav .nav-link:hover {
+    color: var(--primary-color);
+}
+
+/* Buttons */
+.btn {
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    padding: 0.6rem 1.25rem;
+    transition: var(--transition-base);
+}
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+/* Footer */
+.site-footer {
+    background-color: #fff;
+    border-top: 1px solid var(--border-color);
+    color: var(--secondary-color);
+    padding: 3rem 0;
+    margin-top: auto;
+}
+.site-footer h5 { color: var(--dark-color); font-weight: 700; }
+.site-footer a { color: var(--text-muted); }
+.site-footer a:hover { color: var(--primary-color); }
+
+/* ------------------------------------------------------------------
+   4. UTILITIES
+   ------------------------------------------------------------------ */
+.text-primary { color: var(--primary-color) !important; }
+.bg-primary { background-color: var(--primary-color) !important; }
