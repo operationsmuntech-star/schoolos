@@ -15,29 +15,39 @@
 <body class="{% block body_class %}{% endblock %} d-flex flex-column min-vh-100">
 
     {% if not 'auth-page' in block.super %}
-    <nav class="navbar navbar-expand-lg navbar-light">
-        <div class="container">
-            <a class="navbar-brand" href="/">
-                <i class="bi bi-mortarboard-fill text-primary"></i> MunTech
+    <nav class="navbar navbar-expand-lg navbar-light shadow-sm">
+        <div class="container-lg">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="bi bi-mortarboard-fill text-primary me-2"></i>
+                <span>MunTech</span>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Dashboard</a>
+                            <a class="nav-link" href="/dashboard/">Dashboard</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'account_logout' %}">Logout</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-circle me-1"></i>
+                                {{ user.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <li><a class="dropdown-item" href="#">Profile</a></li>
+                                <li><a class="dropdown-item" href="#">Settings</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a></li>
+                            </ul>
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'account_login' %}">Login</a>
+                            <a class="nav-link" href="{% url 'account_login' %}">Sign In</a>
                         </li>
                         <li class="nav-item">
-                            <a class="btn btn-primary ms-2 text-white" href="{% url 'account_signup' %}">Get Started</a>
+                            <a class="btn btn-primary text-white ms-lg-2 mt-2 mt-lg-0" href="{% url 'account_signup' %}">Get Started</a>
                         </li>
                     {% endif %}
                 </ul>
@@ -47,27 +57,41 @@
     {% endif %}
 
     {% if messages %}
-    <div class="container mt-3">
+    <div class="container-lg mt-4">
         {% for message in messages %}
         <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <strong>{{ message.tags|upper }}:</strong> {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
         {% endfor %}
     </div>
     {% endif %}
 
     <main class="{% block main_class %}flex-grow-1{% endblock %}">
-        <div class="{% block container_class %}container py-4{% endblock %}">
+        <div class="{% block container_class %}container-lg py-5{% endblock %}">
             {% block content %}{% endblock %}
         </div>
     </main>
 
-    <footer class="site-footer">
-        <div class="container text-center">
+    <footer class="site-footer mt-auto">
+        <div class="container-lg">
             <div class="row">
-                <div class="col-md-12">
-                    <p class="mb-0 text-muted">&copy; 2026 MunTech. Education Management Evolved.</p>
+                <div class="col-md-6 mb-3">
+                    <h5 class="mb-3">
+                        <i class="bi bi-mortarboard-fill text-primary me-2"></i>
+                        MunTech
+                    </h5>
+                    <p class="text-muted">Transforming education management with innovative technology.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="text-muted mb-0">&copy; 2026 MunTech. All rights reserved.</p>
+                    <p class="text-muted small">Education Management Evolved</p>
+                </div>
+            </div>
+            <hr class="my-3">
+            <div class="row text-center">
+                <div class="col-12">
+                    <p class="text-muted small mb-0">Built with ❤️ for educators worldwide</p>
                 </div>
             </div>
         </div>
