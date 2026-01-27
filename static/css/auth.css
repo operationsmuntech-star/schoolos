@@ -261,6 +261,12 @@ body.auth-page::after {
     appearance: none;
     box-sizing: border-box;
     font-weight: 500;
+    min-height: 50px;
+}
+
+/* Add extra padding on right for password toggle button */
+.input-group input[type="password"] {
+    padding-right: 48px;
 }
 
 .input-group input:focus,
@@ -308,24 +314,25 @@ body.auth-page::after {
 
 .toggle-password {
     position: absolute;
-    right: 16px;
+    right: 12px;
     top: 50%;
     transform: translateY(-50%);
     background: none;
     border: none;
     cursor: pointer;
     color: var(--text-muted);
-    font-size: 1.1rem;
-    padding: 0;
-    margin-top: 12px;
+    font-size: 1.3rem;
+    padding: 8px 10px;
+    margin: 0;
     transition: var(--transition);
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 10;
 }
 
 .toggle-password:hover {
-    color: var(--primary);
+    color: var(--primary-earth);
 }
 
 /* ==========================================

@@ -71,16 +71,18 @@
 
                 <div class="input-group">
                     <label for="id_password">Password</label>
-                    <input type="password" 
-                           name="password" 
-                           id="id_password" 
-                           required 
-                           placeholder="Enter your password"
-                           autocomplete="current-password"
-                           class="form-control">
-                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility('id_password')">
-                        👁️
-                    </button>
+                    <div style="position: relative;">
+                        <input type="password" 
+                               name="password" 
+                               id="id_password" 
+                               required 
+                               placeholder="Enter your password"
+                               autocomplete="current-password"
+                               class="form-control">
+                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility('id_password')">
+                            👁️
+                        </button>
+                    </div>
                 </div>
 
                 <div class="form-actions">
