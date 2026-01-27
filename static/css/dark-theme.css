@@ -366,3 +366,28 @@ body.dark-mode::after {
         color: var(--text-primary);
     }
 }
+/* ========================================
+   ADINKRA DARK MODE STYLES
+   ======================================== */
+
+:root.dark-mode .adinkra-watermark {
+    opacity: 0.08;
+}
+
+:root.dark-mode .card:hover .adinkra-watermark {
+    opacity: 0.15;
+}
+
+:root.dark-mode .adinkra-icon {
+    opacity: 0.8;
+}
+
+:root.dark-mode .btn-icon:hover .adinkra-icon,
+:root.dark-mode .nav-link:hover .adinkra-icon {
+    opacity: 1;
+}
+
+/* Sankofa loader in dark mode */
+:root.dark-mode .loader-sankofa::after {
+    border-color: var(--secondary-gold) transparent var(--secondary-gold) transparent;
+}

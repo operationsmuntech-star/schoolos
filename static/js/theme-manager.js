@@ -316,10 +316,74 @@ class PerformanceMonitor {
     }
 }
 
+/**
+ * Sankofa Loader Manager - Adinkra Cultural Integration
+ * Replaces default loaders with culturally-relevant animated symbol
+ * "Go back and fetch it" - represents learning and retrieval
+ */
+class SankofaLoaderManager {
+    constructor() {
+        this.loaderClass = 'loader-sankofa';
+        this.loaderContainerClass = 'loader-sankofa-container';
+    }
+
+    /**
+     * Create a Sankofa loader element
+     * @returns {HTMLElement} The loader container
+     */
+    createLoader() {
+        const container = document.createElement('div');
+        container.className = this.loaderContainerClass;
+        container.innerHTML = `<div class="${this.loaderClass}"></div>`;
+        return container;
+    }
+
+    /**
+     * Show loader in a target element
+     * @param {HTMLElement|string} target - Element or selector where to show loader
+     */
+    showLoader(target) {
+        const element = typeof target === 'string' ? document.querySelector(target) : target;
+        if (element) {
+            element.innerHTML = '';
+            element.appendChild(this.createLoader());
+        }
+    }
+
+    /**
+     * Hide loader from target element
+     * @param {HTMLElement|string} target - Element or selector
+     */
+    hideLoader(target) {
+        const element = typeof target === 'string' ? document.querySelector(target) : target;
+        if (element) {
+            const loader = element.querySelector(`.${this.loaderClass}`);
+            if (loader) loader.remove();
+        }
+    }
+
+    /**
+     * Replace Bootstrap spinners with Sankofa loader
+     * Automatically finds and replaces all .spinner-border elements
+     */
+    replaceBootstrapSpinners() {
+        const spinners = document.querySelectorAll('.spinner-border, .spinner-grow');
+        spinners.forEach(spinner => {
+            const container = spinner.parentElement;
+            spinner.remove();
+            container.appendChild(this.createLoader());
+        });
+    }
+}
+
+// Initialize Sankofa Loader
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         new PerformanceMonitor();
+        window.sankofaLoader = new SankofaLoaderManager();
+        window.sankofaLoader.replaceBootstrapSpinners();
     });
 } else {
     new PerformanceMonitor();
-}
+    window.sankofaLoader = new SankofaLoaderManager();
+    window.sankofaLoader.replaceBootstrapSpinners();
