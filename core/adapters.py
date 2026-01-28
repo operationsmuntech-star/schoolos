@@ -45,8 +45,12 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         """
         Override to send emails asynchronously via Celery.
         This prevents request timeout during signup.
+        Falls back to sync if Celery is unavailable.
         """
         from django.template.loader import render_to_string
+        import logging
+        
+        logger = logging.getLogger(__name__)
         
         # Render email template
         subject = render_to_string(
@@ -57,13 +61,23 @@ class CustomAccountAdapter(DefaultAccountAdapter):
             f'{template_prefix}_message.txt', context
         ).strip()
         
-        # Send asynchronously
-        send_html_email_task.delay(
-            subject=subject,
-            html_message=message,
-            from_email=None,
-            recipient_list=[email]
-        )
+        try:
+            # Try to send asynchronously
+            send_html_email_task.delay(
+                subject=subject,
+                html_message=message,
+                from_email=None,
+                recipient_list=[email]
+            )
+        except Exception as e:
+            # If Celery/Redis fails, fall back to sync email
+            logger.warning(f"Celery task failed, sending email synchronously: {e}")
+            try:
+                send_html_email_task.apply(
+                    args=(subject, message, None, [email])
+                )
+            except Exception as sync_error:
+                logger.error(f"Email send failed: {sync_error}")
 
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):

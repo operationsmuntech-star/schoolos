@@ -259,7 +259,7 @@ CELERY_TIMEZONE = 'UTC'
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 minutes
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
-CELERY_TASK_ALWAYS_EAGER = not DEBUG  # Run async in production, sync in development
+CELERY_TASK_ALWAYS_EAGER = DEBUG  # Run sync in development, async in production
 
 # Session & Cookie Optimization
 SESSION_COOKIE_AGE = 86400 * 7  # 7 days
