@@ -215,7 +215,225 @@ The system is fully responsive:
 
 ---
 
+## 🏫 Director Onboarding System (Multi-Tenant SaaS)
+
+MunTech implements a sophisticated **two-phase director onboarding system** enabling schools to self-register and fully configure their instance:
+
+### Phase 1: Director Account Creation
+**Endpoint**: `/users/director/signup/`
+
+School directors create their account with:
+- Email (used as login username)
+- First & Last Name
+- Phone Number
+- Password (validated for security)
+
+**Form**: `SchoolDirectorSignUpForm` in `core/users/forms.py`
+
+**Flow**:
+1. Director fills signup form
+2. Account created with role `admin`
+3. User marked as `is_verified=False` until school setup complete
+4. User automatically logged in
+5. Redirects to School Setup form
+
+### Phase 2: School Configuration
+**Endpoint**: `/users/director/school-setup/`
+
+Directors provide comprehensive school details:
+
+#### Basic Information
+- School name (unique identifier)
+- School type (Primary/Secondary/Combined/Tertiary)
+- Complete address
+- City/Town
+- Country (27 African countries supported + custom)
+
+#### Contact Details
+- School phone number
+- School email address
+
+#### School Statistics
+- Total student population
+- Number of teachers
+- Number of classes/grades
+- Year founded
+
+#### Academic Settings
+- Academic calendar (January-December, September-August, April-March, Custom)
+- Currency code (GHS, NGN, KES, etc.)
+
+#### Facilities
+- Library available?
+- Science laboratory?
+- Sports facilities?
+- Computer lab?
+
+#### Additional Info
+- School motto/vision statement
+
+**Form**: `SchoolSetupForm` in `core/users/forms.py` (20+ fields with validation)
+
+**Flow**:
+1. Director accesses protected view (must be logged in)
+2. Form pre-populated if school already exists
+3. Form submission validates all fields
+4. School object created/updated in database
+5. Director marked as `is_verified=True`
+6. `setup_completed=True` flag set on school
+7. Redirects to dashboard
+
+### Database Schema
+
+#### School Model
+```python
+class School(models.Model):
+    name = CharField(max_length=200, unique=True)
+    slug = SlugField(unique=True)  # Auto-generated from name
+    address = TextField()
+    phone = CharField()
+    email = EmailField()
+    
+    # Classification
+    school_type = CharField(choices=[...])
+    country = CharField()
+    city = CharField()
+    motto = CharField()
+    founded_year = IntegerField()
+    
+    # Statistics
+    student_population = IntegerField()
+    teacher_count = IntegerField()
+    class_count = IntegerField()
+    
+    # Facilities
+    has_library = BooleanField()
+    has_laboratory = BooleanField()
+    has_sports = BooleanField()
+    has_computer_lab = BooleanField()
+    
+    # Settings
+    academic_calendar = CharField()
+    currency = CharField()
+    
+    # Status
+    created_at = DateTimeField(auto_now_add=True)
+    updated_at = DateTimeField(auto_now=True)
+    is_active = BooleanField(default=True)
+    setup_completed = BooleanField(default=False)
+```
+
+#### User-School Relationship
+```python
+class CustomUser(AbstractUser):
+    school = ForeignKey(School, on_delete=models.CASCADE)
+    role = CharField(choices=[...])  # admin, teacher, student, parent
+    is_verified = BooleanField(default=False)
+```
+
+### Views & URLs
+
+#### URLs Configuration
+```
+/users/director/signup/          → SchoolDirectorSignUpForm
+/users/director/school-setup/    → SchoolSetupForm
+/users/director/setup-success/   → Completion page
+/users/profile/                  → Director profile
+/users/school-profile/           → School settings
+```
+
+#### Key Views
+
+**`director_signup(request)`**
+- Handles account creation
+- Creates admin user with school link pending
+- Automatic login after registration
+- Redirects to school setup
+
+**`school_setup(request)`**
+- Protected view (login required)
+- Director-only access
+- Validates comprehensive school data
+- Creates/updates School instance
+- Links user to school
+- Marks as verified & setup complete
+
+**`setup_success(request)`**
+- Completion confirmation
+- Next steps guidance
+- Quick links to dashboard
+
+### Templates
+
+#### `templates/account/director_signup.html`
+- Modern gradient background (#8D6E63 to #00897B)
+- Centered card design
+- Form validation error display
+- Password requirements display
+- Link to login page
+
+#### `templates/account/school_setup.html`
+- Progress indicator
+- Organized into 5 sections:
+  1. Basic Information
+  2. Contact Details
+  3. School Statistics
+  4. Additional Information
+  5. School Facilities
+- Mobile responsive layout
+- Form validation with helpful error messages
+- Skip option to return to dashboard
+
+### Multi-Tenancy Implementation
+
+#### School Context Middleware
+*Future implementation*: `SchoolContextMiddleware` in `core/middleware.py` will:
+- Detect current user's school from request
+- Inject school context into request object
+- Filter all queries by user's school
+- Prevent cross-school data access
+
+#### Dashboard Integration
+Dashboard automatically displays school-specific:
+- Student enrollment metrics
+- Teacher statistics
+- Class distribution
+- Facility information
+- Fee statistics (per currency)
+
+### Security Features
+
+✅ **Form Validation**
+- Email uniqueness check
+- School name uniqueness check
+- Password strength validation
+- Required field validation
+
+✅ **Access Control**
+- Login required for setup form
+- Director-only access checks
+- Setup completion verification
+
+✅ **Data Isolation**
+- Users linked to single school
+- Queries filtered by school
+- Foreign key constraints
+
+### Future Enhancements
+
+Planned improvements:
+- Email verification for director accounts
+- School approval workflow (for multi-tenant SaaS)
+- Logo/branding upload during setup
+- Integration with payment providers
+- School subscription tiers
+- Custom domain support
+- Advanced settings wizard for teachers/students
+
+---
+
 ## 🤝 Contributing
+
 
 To contribute to MunTech:
 
