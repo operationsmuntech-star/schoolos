@@ -239,6 +239,7 @@ ACCOUNT_EMAIL_VERIFICATION = 'optional'
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_ADAPTER = 'core.adapters.CustomAccountAdapter'
 SOCIALACCOUNT_ADAPTER = 'core.adapters.CustomSocialAccountAdapter'
+ACCOUNT_SIGNUP_FORM_CLASS = 'core.forms.CustomSignupForm'
 
 # Email Configuration - Gmail SMTP
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
