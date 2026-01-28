@@ -100,3 +100,10 @@ class CustomSignupForm(forms.Form):
         )
         
         return user
+    
+    def signup(self, request, user):
+        """
+        Called by allauth after user creation to perform post-signup actions.
+        This is a required method for custom signup forms in django-allauth.
+        """
+        pass
