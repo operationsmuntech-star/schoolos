@@ -811,12 +811,11 @@
     content: '';
     display: block;
     position: absolute;
-    width: 60%;
-    height: 60%;
-    top: 20%;
-    left: 20%;
-    border-radius: 50%;
-    background: url('/static/img/adinkra/akoko-nan.svg') no-repeat center;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: url('/static/img/adinkra/3-dots-move.svg') no-repeat center;
     background-size: contain;
     animation: sankofa-spin 1.2s linear infinite;
 }
