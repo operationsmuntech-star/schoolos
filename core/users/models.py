@@ -1,20 +1,57 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.text import slugify
+import json
 
 class School(models.Model):
     """The Tenant Model: Every user and student belongs to a School"""
+    
+    SCHOOL_TYPE_CHOICES = (
+        ('primary', 'Primary School'),
+        ('secondary', 'Secondary School'),
+        ('combined', 'Combined (Primary + Secondary)'),
+        ('tertiary', 'Tertiary/Higher Education'),
+    )
+    
     name = models.CharField(max_length=200, unique=True)
     slug = models.SlugField(unique=True, help_text="URL friendly name (e.g. joyland-school)")
     address = models.TextField(blank=True)
+    phone = models.CharField(max_length=20, blank=True)
+    email = models.EmailField(blank=True)
+    
+    # School Details
+    school_type = models.CharField(max_length=50, choices=SCHOOL_TYPE_CHOICES, blank=True)
+    country = models.CharField(max_length=100, blank=True)
+    city = models.CharField(max_length=100, blank=True)
+    motto = models.CharField(max_length=200, blank=True)
+    founded_year = models.IntegerField(null=True, blank=True)
+    
+    # School Statistics
+    student_population = models.IntegerField(default=0)
+    teacher_count = models.IntegerField(default=0)
+    class_count = models.IntegerField(default=0)
+    
+    # Facilities
+    has_library = models.BooleanField(default=False)
+    has_laboratory = models.BooleanField(default=False)
+    has_sports = models.BooleanField(default=False)
+    has_computer_lab = models.BooleanField(default=False)
+    
+    # Academic Settings
+    academic_calendar = models.CharField(max_length=100, default="January - December")
+    currency = models.CharField(max_length=3, default="GHS")
+    
+    # School Status
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
+    setup_completed = models.BooleanField(default=False, help_text="Has director completed initial setup?")
     
     class Meta:
         db_table = 'schools'
         verbose_name = 'School'
         verbose_name_plural = 'Schools'
-        ordering = ['name']
+        ordering = ['-created_at']
     
     def __str__(self):
         return self.name
