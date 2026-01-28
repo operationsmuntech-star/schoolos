@@ -1,9 +1,43 @@
 """
-Custom adapter to fix MultipleObjectsReturned error in allauth.
-This handles the case where get_app() fails due to database issues.
+Custom adapters to fix allauth integration issues.
 """
+from allauth.account.adapter import DefaultAccountAdapter
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from django.contrib.sites.models import Site
+
+
+class CustomAccountAdapter(DefaultAccountAdapter):
+    """
+    Custom account adapter to properly handle username generation during signup.
+    Ensures email is used as username to avoid duplicate key violations.
+    """
+    
+    def save_user(self, request, sociallogin, form=None):
+        """
+        Save user during signup. If it's a regular signup (not social),
+        form will be present and we set username from email.
+        """
+        user = super().save_user(request, sociallogin, form)
+        
+        # For regular signup, form will be present
+        if form and hasattr(user, 'email') and user.email:
+            # Ensure username is set to email for login purposes
+            if not user.username or user.username == '':
+                user.username = user.email
+                user.save(update_fields=['username'])
+        
+        return user
+    
+    def pre_authenticate(self, request, **credentials):
+        """
+        Support email-based login by converting email to username.
+        """
+        # If login is via email, convert it to username
+        if 'username' in credentials and '@' in credentials['username']:
+            email = credentials['username']
+            credentials['username'] = email
+        
+        return super().pre_authenticate(request, **credentials)
 
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
