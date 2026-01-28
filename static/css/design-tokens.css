@@ -1,0 +1,194 @@
+/* ========================================
+   MUNTECH DESIGN SYSTEM 2026
+   African-Inspired, Education-First, Modern
+   ======================================== */
+
+:root {
+    /* ADINKRA COLOR PALETTE
+       - Inspired by traditional African patterns
+       - Earth tones for trust & stability
+       - Bold accents for engagement
+    */
+    
+    /* EARTH TONES - Primary Palette */
+    --earth-darkbrown: #5D4037;      /* Deep soil - foundation */
+    --earth-brown: #8D6E63;          /* Rich earth - primary */
+    --earth-tan: #A1887F;            /* Warm sand - secondary */
+    --earth-cream: #D7CCC8;          /* Light cream - backgrounds */
+    
+    /* GOLD ACCENTS - Prestige & Success */
+    --gold-dark: #B8860B;            /* Dark goldenrod */
+    --gold-main: #DAA520;            /* Main gold accent */
+    --gold-light: #FFD700;           /* Bright gold - highlights */
+    
+    /* TEAL GROWTH - Energy & Growth */
+    --teal-dark: #00695C;            /* Deep teal - trust */
+    --teal-main: #00897B;            /* Main teal accent */
+    --teal-light: #4DB8AA;           /* Light teal - highlights */
+    
+    /* SEMANTIC COLORS */
+    --success: #2E7D32;              /* Growth green */
+    --success-light: #81C784;
+    --warning: #F57C00;              /* Alert orange */
+    --warning-light: #FFB74D;
+    --danger: #C62828;               /* Alert red */
+    --danger-light: #EF5350;
+    --info: #1565C0;                 /* Info blue */
+    --info-light: #42A5F5;
+    
+    /* NEUTRALS - Modern Grayscale */
+    --white: #FFFFFF;
+    --gray-50: #FAFAF8;              /* Warm off-white */
+    --gray-100: #F5F1E8;             /* Cream */
+    --gray-200: #EFEBE9;             /* Light tan */
+    --gray-300: #D7CCC8;             /* Tan */
+    --gray-400: #BCAAA4;             /* Medium gray */
+    --gray-500: #795548;             /* Medium brown */
+    --gray-600: #5D4037;             /* Dark brown */
+    --gray-700: #3E2723;             /* Very dark brown */
+    --gray-800: #263238;             /* Charcoal */
+    --gray-900: #1a1a1a;             /* Nearly black */
+    
+    /* TEXT COLORS */
+    --text-primary: #263238;         /* High contrast dark */
+    --text-secondary: #546E7A;       /* Medium contrast */
+    --text-tertiary: #90A4AE;        /* Low contrast */
+    --text-white: #FFFFFF;
+    --text-muted: #9E9E9E;
+    
+    /* GRADIENTS - Stories & Movement */
+    --gradient-earth: linear-gradient(135deg, #8D6E63 0%, #D7CCC8 100%);
+    --gradient-gold: linear-gradient(135deg, #DAA520 0%, #FFD700 100%);
+    --gradient-growth: linear-gradient(135deg, #00897B 0%, #4DB8AA 100%);
+    --gradient-premium: linear-gradient(135deg, #8D6E63 0%, #00897B 100%);
+    --gradient-warm: linear-gradient(135deg, #DAA520 0%, #F57C00 100%);
+    
+    /* TYPOGRAPHY */
+    --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    --font-family-display: 'Inter', 'Poppins', var(--font-family-base);
+    --font-family-serif: 'Georgia', 'Garamond', serif;
+    --font-family-mono: 'Courier New', 'Monaco', monospace;
+    
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 1.875rem;
+    --font-size-4xl: 2.25rem;
+    --font-size-5xl: 3rem;
+    
+    --line-height-tight: 1.25;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.75;
+    
+    --font-weight-light: 300;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-extrabold: 800;
+    
+    /* SPACING */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 2.5rem;
+    --spacing-3xl: 3rem;
+    --spacing-4xl: 4rem;
+    
+    /* BORDER RADIUS */
+    --radius-none: 0px;
+    --radius-xs: 4px;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-2xl: 24px;
+    --radius-full: 9999px;
+    
+    /* SHADOWS - Elevation System */
+    --shadow-none: none;
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.12);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+    --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+    --shadow-earth: 0 8px 16px rgba(93, 64, 55, 0.15);
+    
+    /* GLASS MORPHISM */
+    --glass-light: rgba(255, 255, 255, 0.75);
+    --glass-dark: rgba(38, 50, 56, 0.8);
+    --glass-blur: blur(12px);
+    --glass-backdrop: backdrop-filter: var(--glass-blur);
+    
+    /* TRANSITIONS & ANIMATIONS */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-spring: 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    --transition-smooth: 300ms ease-in-out;
+    
+    /* Z-INDEX SYSTEM */
+    --z-base: 1;
+    --z-dropdown: 100;
+    --z-sticky: 200;
+    --z-fixed: 300;
+    --z-modal-backdrop: 400;
+    --z-modal: 500;
+    --z-tooltip: 600;
+    --z-notification: 700;
+}
+
+/* DARK MODE PALETTE */
+:root.dark-mode {
+    /* EARTH TONES - Darkened */
+    --earth-darkbrown: #3E2723;
+    --earth-brown: #5D4037;
+    --earth-tan: #6D4C41;
+    --earth-cream: #1a1a1a;
+    
+    /* GOLD - Brightened for contrast */
+    --gold-main: #FFC107;
+    --gold-light: #FFD54F;
+    
+    /* TEAL - Brightened */
+    --teal-main: #26C6DA;
+    --teal-light: #80DEEA;
+    
+    /* NEUTRALS - Inverted */
+    --gray-50: #263238;
+    --gray-100: #37474F;
+    --gray-200: #455A64;
+    --gray-300: #546E7A;
+    --gray-400: #78909C;
+    --gray-500: #90A4AE;
+    --gray-600: #B0BEC5;
+    --gray-700: #CFD8DC;
+    --gray-800: #ECEFF1;
+    --gray-900: #F5F5F5;
+    
+    /* TEXT - Inverted */
+    --text-primary: #ECEFF1;
+    --text-secondary: #B0BEC5;
+    --text-tertiary: #78909C;
+    --text-white: #263238;
+    
+    color-scheme: dark;
+}
+
+/* RESPONSIVE VARIABLES */
+@media (max-width: 768px) {
+    :root {
+        --font-size-3xl: 1.5rem;
+        --font-size-4xl: 1.875rem;
+        --font-size-5xl: 2.25rem;
+        --spacing-3xl: 2rem;
+        --spacing-4xl: 2.5rem;
+    }
+}

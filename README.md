@@ -1,6 +1,109 @@
-# MunTech - School Management System
+# MunTech - Modern School Management System
 
-A production-ready school management platform built with Django 5.0.1, featuring a modern premium UI/UX design with dark mode support.
+A culturally-inspired, production-ready school management platform built with Django 5.0.1, featuring earth-tone aesthetics, modern UX/UI design, and comprehensive educational features.
+
+---
+
+## 🌍 Cultural Vision
+
+MunTech is designed with **African inspiration** at its core, blending traditional values with modern technology:
+
+- **Earth Tones Palette**: Rich browns, warm golds, and teal accents inspired by African landscapes
+- **Design Philosophy**: Education-first approach emphasizing clarity, accessibility, and user empowerment
+- **Adinkra Integration**: African wisdom symbols used throughout the design system for cultural authenticity
+- **Community Focus**: Built for institutions to thrive, fostering collaboration between administrators, teachers, parents, and students
+
+---
+
+## ✨ Key Features
+
+### Core Modules
+- **Users** - Multi-role authentication (Admin, Principal, Teacher, Parent, Student)
+- **Dashboard** - Comprehensive analytics and quick access to all systems
+- **Admissions** - Student enrollment, applications, and registration management
+- **Attendance** - Real-time tracking with automated reporting
+- **Examinations** - Exam management, grade recording, and result analysis
+- **Fees** - Fee collection, payment tracking, and financial management
+- **Payments** - Secure payment processing and transaction handling
+
+### Modern UX/UI System
+- **Design Tokens** - Complete, scalable design system with CSS variables
+- **Dark Mode** - Full dark theme support with system preference detection
+- **Responsive Layout** - Mobile-first, fully responsive across all devices
+- **Micro-Interactions** - Smooth animations, transitions, and user feedback
+- **Accessibility** - WCAG compliant with keyboard navigation support
+- **Performance** - Optimized CSS, lightweight JavaScript, smooth page loads
+
+---
+
+## 📁 Project Structure
+
+```
+SCHOOL/
+├── config/                    # Django settings & URLs
+│   ├── settings.py           # Main configuration
+│   ├── urls.py               # URL routing
+│   ├── wsgi.py               # Production server
+│   └── asgi.py               # Async support
+│
+├── core/                      # Main application modules
+│   ├── users/                # User management & authentication
+│   ├── dashboard/            # Dashboard & analytics
+│   ├── admissions/           # Student admissions
+│   ├── attendance/           # Attendance tracking
+│   ├── examinations/         # Exam management
+│   ├── fees/                 # Fee management
+│   ├── payments/             # Payment processing
+│   └── adminpanel/           # Admin interface
+│
+├── templates/                 # HTML templates
+│   ├── base.html             # Base template with navbar & footer
+│   ├── account/              # Authentication pages
+│   ├── dashboard/            # Dashboard pages
+│   ├── admissions/           # Admissions templates
+│   ├── attendance/           # Attendance templates
+│   ├── examinations/         # Exam templates
+│   ├── fees/                 # Fee templates
+│   └── payments/             # Payment templates
+│
+├── static/                    # Static assets
+│   ├── css/
+│   │   ├── design-tokens.css      # Design system variables
+│   │   ├── components.css         # Reusable components
+│   │   ├── navbar.css             # Navigation styling
+│   │   ├── footer.css             # Footer styling
+│   │   ├── animations.css         # Animations & micro-interactions
+│   │   └── dark-mode.css          # Dark theme overrides
+│   └── js/
+│       └── app.js                 # Interactive features
+│
+└── staticfiles/              # Generated static files (production)
+```
+
+---
+
+## 🎨 Design System
+
+### Color Palette (Earth Tones - African Inspired)
+```
+Primary:      #8D6E63 (Rich Earth Brown)
+Secondary:    #D7CCC8 (Warm Cream)
+Accent:       #DAA520 (Gold)
+Growth:       #00897B (Teal)
+```
+
+### Typography
+- **Display Font**: Inter (modern, clean)
+- **Body Font**: System stack (optimized performance)
+- **Mono Font**: Courier New (code & data)
+
+### Spacing System
+- **Base Unit**: 1rem (16px)
+- **Scale**: xs (0.25rem) → 4xl (4rem)
+
+### Shadow System (Elevation)
+- **xs-2xl**: Subtle to prominent elevation
+- **Inner**: Inset shadows for depth
 
 ---
 
@@ -17,18 +120,23 @@ pip install -r requirements.txt
 ```
 
 ### 2. Configure Local Environment
-Create `.env` file (do NOT commit):
+Create `.env` file in project root (do NOT commit):
 ```
 SECRET_KEY=your-django-secret-key
 DEBUG=True
 GOOGLE_CLIENT_ID=your-google-oauth-id
 GOOGLE_CLIENT_SECRET=your-google-oauth-secret
+DATABASE_URL=sqlite:///db.sqlite3  # Optional for PostgreSQL
 ```
 
 ### 3. Initialize Database
 ```powershell
 python manage.py migrate
 python manage.py createsuperuser
+```
+
+### 4. Run Development Server
+```powershell
 python manage.py runserver
 ```
 
@@ -36,68 +144,105 @@ python manage.py runserver
 
 ---
 
-## ✨ Features
+## 🛠️ Technology Stack
 
-### Core Modules
-- **Users** - Multi-role authentication (Admin, Principal, Teacher, Parent, Student)
-- **Dashboard** - Central management with analytics
-- **Admissions** - Student enrollment & applications
-- **Attendance** - Real-time attendance tracking
-- **Examinations** - Exam management & results
-- **Fees** - Fee collection & payment tracking
-- **Payments** - Secure payment processing
+### Backend
+- **Framework**: Django 5.0.1
+- **Database**: SQLite (dev) / PostgreSQL (production)
+- **Server**: Gunicorn + Whitenoise
+- **Authentication**: Django Allauth with Google OAuth
 
-### Premium UI/UX Design (2026)
-- **School-Themed Design** - Natural African earth tones (brown, gold, teal)
-- **Dark Mode** - Full dark mode support with system preference detection
-- **Responsive Layout** - Mobile-first, fully responsive design
-- **Micro-Interactions** - Smooth animations and ripple effects
-- **Accessibility** - WCAG AAA compliant
-- **Performance** - Optimized CSS and lightweight JavaScript
+### Frontend
+- **CSS Architecture**: Custom design system (no Bootstrap)
+- **JavaScript**: Vanilla JS with modern APIs
+- **Icons**: Bootstrap Icons
+- **Fonts**: Inter (Google Fonts)
 
----
-
-## 📁 Project Structure
-
-```
-SCHOOL/
-├── config/                 # Django settings & URLs
-├── core/                   # Main app modules
-│   ├── users/             # User management
-│   ├── dashboard/         # Dashboard views
-│   ├── admissions/        # Admissions module
-│   ├── attendance/        # Attendance tracking
-│   ├── examinations/      # Exam management
-│   ├── fees/              # Fee management
-│   └── payments/          # Payment processing
-├── templates/             # HTML templates
-│   ├── base.html          # Main template with dark mode toggle
-│   ├── account/           # Auth pages (school-themed)
-│   └── [modules]/         # Module-specific templates
-├── static/                # Static assets (CSS, JS)
-│   ├── css/
-│   │   ├── auth.css       # School-themed login page
-│   │   ├── premium.css    # Design tokens & components
-│   │   └── dark-theme.css # Dark mode system
-│   └── js/
-│       └── theme-manager.js # Theme switching & interactions
-└── staticfiles/           # Generated by collectstatic (production)
-```
+### Development
+- **Code Quality**: Black, isort, flake8
+- **Pre-commit Hooks**: Automatic code formatting
+- **Testing**: pytest (ready to implement)
 
 ---
 
-## 🎨 Design System
+## 📊 Dashboard Features
 
-### Colors (School-Themed Earth Tones)
-- **Primary**: `#8B6F47` (Rich brown - trustworthy)
-- **Secondary**: `#D4A574` (Warm gold - prestige)
-- **Accent**: `#2B7A78` (Deep teal - growth)
-- **Background**: `#FAFAF8` (Warm white), `#F5F1E8` (Cream)
+The dashboard provides:
+- **Key Statistics**: Real-time student, teacher, and class counts
+- **Attendance Overview**: Current attendance rates and trends
+- **Quick Access**: Fast navigation to all major modules
+- **Recent Activity**: Latest system updates and changes
+- **Performance Metrics**: Visual representations of school metrics
 
-### CSS Organization
-- `premium.css` - Design tokens, components, animations (90+ CSS variables)
-- `dark-theme.css` - Dark mode overrides with system detection
-- `auth.css` - School-themed authentication pages
+---
+
+## 🔐 Security & Compliance
+
+- **CSRF Protection**: Enabled on all forms
+- **SQL Injection**: Protected by Django ORM
+- **XSS Prevention**: Template auto-escaping
+- **Secure Headers**: Security middleware configured
+- **Password Security**: Hashed with PBKDF2
+- **CORS**: Configurable for API security
+
+---
+
+## 📱 Responsive Design
+
+The system is fully responsive:
+- **Desktop**: Full layout with sidebar navigation
+- **Tablet**: Optimized grid layouts
+- **Mobile**: Touch-friendly interface with hamburger menu
+
+---
+
+## 🌙 Dark Mode
+
+- **Auto-detection**: System preference detection
+- **Manual Toggle**: Theme switch in navbar
+- **Persistent**: Saves user preference to localStorage
+- **Comprehensive**: All colors adjusted for dark mode
+
+---
+
+## 📈 Performance
+
+- **CSS**: Minimal, optimized with variables
+- **JavaScript**: Lightweight, vanilla implementations
+- **Images**: Lazy loading support
+- **Caching**: Django cache framework configured
+- **Fonts**: System fonts + optional Google Fonts
+
+---
+
+## 🤝 Contributing
+
+To contribute to MunTech:
+
+1. Create a feature branch: `git checkout -b feature/YourFeature`
+2. Make your changes
+3. Run code quality checks: `black . && isort . && flake8`
+4. Commit: `git commit -am 'Add YourFeature'`
+5. Push: `git push origin feature/YourFeature`
+6. Create a Pull Request
+
+---
+
+## 📝 License
+
+This project is licensed under the MIT License. See LICENSE file for details.
+
+---
+
+## 📧 Support
+
+For support, email: support@muntech.edu
+
+For documentation: [Full Documentation](./docs/)
+
+---
+
+**Built with ❤️ for educational institutions worldwide**
 
 ### JavaScript
 - `theme-manager.js` - Theme switching, localStorage persistence, micro-interactions
