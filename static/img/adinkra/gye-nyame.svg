@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Gye Nyame (God is There - Protection/Universal) -->
+  <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" stroke-width="3"/>
+  <path d="M 50 10 L 70 35 L 90 50 L 70 65 L 50 90 L 30 65 L 10 50 L 30 35 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+  <circle cx="50" cy="50" r="10" fill="currentColor"/>
+</svg>
