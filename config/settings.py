@@ -246,7 +246,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'operations.muntech@gmail.com'
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_PASSWORD', 'ufac wngi qfby sost')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_PASSWORD')
 DEFAULT_FROM_EMAIL = 'operations.muntech@gmail.com'
 
 # Session & Cookie Optimization
