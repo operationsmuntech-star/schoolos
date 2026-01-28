@@ -1,15 +1,17 @@
 """
-Custom adapters to fix allauth integration issues.
+Custom adapters to fix allauth integration issues and enable async email.
 """
 from allauth.account.adapter import DefaultAccountAdapter
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from django.contrib.sites.models import Site
+from core.tasks import send_html_email_task
 
 
 class CustomAccountAdapter(DefaultAccountAdapter):
     """
     Custom account adapter to properly handle username generation during signup.
     Ensures email is used as username to avoid duplicate key violations.
+    Uses async tasks for email sending to prevent timeouts.
     """
     
     def save_user(self, request, sociallogin, form=None):
@@ -38,6 +40,30 @@ class CustomAccountAdapter(DefaultAccountAdapter):
             credentials['username'] = email
         
         return super().pre_authenticate(request, **credentials)
+    
+    def send_mail(self, template_prefix, email, context):
+        """
+        Override to send emails asynchronously via Celery.
+        This prevents request timeout during signup.
+        """
+        from django.template.loader import render_to_string
+        
+        # Render email template
+        subject = render_to_string(
+            f'{template_prefix}_subject.txt', context
+        ).strip()
+        
+        message = render_to_string(
+            f'{template_prefix}_message.txt', context
+        ).strip()
+        
+        # Send asynchronously
+        send_html_email_task.delay(
+            subject=subject,
+            html_message=message,
+            from_email=None,
+            recipient_list=[email]
+        )
 
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):

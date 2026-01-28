@@ -249,6 +249,18 @@ EMAIL_HOST_USER = 'operations.muntech@gmail.com'
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_PASSWORD')
 DEFAULT_FROM_EMAIL = 'operations.muntech@gmail.com'
 
+# Celery Configuration - Async Task Queue
+CELERY_BROKER_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 minutes
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_TASK_ALWAYS_EAGER = not DEBUG  # Run async in production, sync in development
+
 # Session & Cookie Optimization
 SESSION_COOKIE_AGE = 86400 * 7  # 7 days
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
