@@ -11,9 +11,8 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dev-key-change-in-pro
 
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,*.railway.app').split(',')
-if DEBUG:
-    ALLOWED_HOSTS = ['*']  # Allows any IP (like 192.168.x.x) during local development
+# Allow everyone (Local LAN + Railway)
+ALLOWED_HOSTS = ['*']
 
 # Database configuration - supports both SQLite and PostgreSQL
 if os.environ.get('DATABASE_URL'):
