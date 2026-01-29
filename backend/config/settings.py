@@ -139,6 +139,9 @@ CORS_ALLOW_CREDENTIALS = True
 
 # Security settings for production (only on Railway with DATABASE_URL)
 if not DEBUG and os.environ.get('DATABASE_URL'):
+    # Tells Django to trust the X-Forwarded-Proto header from Railway's Load Balancer
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
