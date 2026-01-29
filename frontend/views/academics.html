@@ -1,0 +1,48 @@
+<!-- Academics View -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Academics - MunTech School Infra</title>
+  <link rel="stylesheet" href="../styles/tailwind.css">
+  <link rel="stylesheet" href="../styles/base.css">
+</head>
+<body class="bg-gray-50">
+  <div id="app-container">
+    <header class="bg-indigo-600 text-white p-4">
+      <h1>Academics</h1>
+      <p class="text-sm">View grades and academic performance</p>
+    </header>
+
+    <div class="container mx-auto p-4">
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="mb-6">
+          <label class="block text-sm font-semibold mb-2">Select Student</label>
+          <select id="studentSelect" class="w-full p-2 border border-gray-300 rounded-lg">
+            <option>Choose a student...</option>
+          </select>
+        </div>
+
+        <div id="academicsContent">
+          <table class="w-full">
+            <thead class="bg-gray-100 border-b">
+              <tr>
+                <th class="p-2 text-left">Subject</th>
+                <th class="p-2 text-center">Term 1</th>
+                <th class="p-2 text-center">Term 2</th>
+                <th class="p-2 text-center">Term 3</th>
+                <th class="p-2 text-center">Overall</th>
+              </tr>
+            </thead>
+            <tbody id="academicsTable">
+              <!-- Academic records will be loaded here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="../scripts/app.js"></script>
+</body>
+</html>

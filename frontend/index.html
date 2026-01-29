@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MunTech School Infra</title>
+<link rel="stylesheet" href="styles/tailwind.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4F46E5">
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans">
+<div id="app">
+  <header class="bg-indigo-600 text-white p-4 flex justify-between items-center">
+    <h1 class="text-xl font-bold">MunTech School Infra</h1>
+    <span id="status" class="text-sm">Offline</span>
+  </header>
+
+  <div class="flex h-screen">
+    <nav class="bg-indigo-100 w-64 p-4">
+      <ul class="space-y-2">
+        <li><a href="views/dashboard.html" class="block p-2 rounded hover:bg-indigo-200">Dashboard</a></li>
+        <li><a href="views/attendance.html" class="block p-2 rounded hover:bg-indigo-200">Attendance</a></li>
+        <li><a href="views/academics.html" class="block p-2 rounded hover:bg-indigo-200">Academics</a></li>
+        <li><a href="views/settings.html" class="block p-2 rounded hover:bg-indigo-200">Settings</a></li>
+      </ul>
+    </nav>
+
+    <main class="flex-1 p-4">
+      <h2 class="text-2xl font-semibold">Welcome to MunTech School Infrastructure</h2>
+      <p class="mt-2">This app works offline. Install it to your device to start using the school infrastructure anywhere.</p>
+    </main>
+  </div>
+</div>
+
+<script src="scripts/db.js"></script>
+<script src="scripts/app.js"></script>
+<script src="scripts/install.js"></script>
+<script src="service-worker.js"></script>
+</body>
+</html>
