@@ -1,11 +1,11 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Sum
 from core.users.models import Student, Teacher, School
 from core.attendance.models import Attendance, AttendanceReport
 from core.admissions.models import Admission
-from core.fees.models import Fee
+from core.fees.models import Invoice, FeePayment
 import json
 from datetime import datetime, timedelta
 
@@ -118,13 +118,13 @@ def module_stats(request, module_name):
             }
         
         elif module_name == 'fees':
-            fees_query = Fee.objects.all()
+            invoices_query = Invoice.objects.all()
             if school:
-                fees_query = fees_query.filter(student__school=school)
+                invoices_query = invoices_query.filter(student__school=school)
             stats = {
-                'total': fees_query.count(),
-                'paid': fees_query.filter(paid=True).count(),
-                'pending': fees_query.filter(paid=False).count(),
+                'total': invoices_query.count(),
+                'paid': invoices_query.filter(balance=0).count(),
+                'pending': invoices_query.filter(balance__gt=0).count(),
             }
         
         elif module_name == 'attendance':

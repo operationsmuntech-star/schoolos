@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser, Student, Teacher, School
+from .models import CustomUser, Student, Teacher, School, TeacherAssignment, StudentClass
 
 @admin.register(School)
 class SchoolAdmin(admin.ModelAdmin):
@@ -36,6 +36,16 @@ class StudentAdmin(admin.ModelAdmin):
         return obj.user.get_full_name()
     get_user_name.short_description = 'Name'
 
+@admin.register(StudentClass)
+class StudentClassAdmin(admin.ModelAdmin):
+    list_display = ['name', 'school', 'class_teacher', 'capacity', 'level', 'is_active']
+    list_filter = ['school', 'level', 'is_active']
+    search_fields = ['name', 'school__name', 'class_teacher__user__first_name']
+    fieldsets = (
+        ('Class Details', {'fields': ('school', 'name', 'level', 'class_teacher')}),
+        ('Settings', {'fields': ('capacity', 'is_active')}),
+    )
+
 @admin.register(Teacher)
 class TeacherAdmin(admin.ModelAdmin):
     list_display = ['employee_id', 'get_user_name', 'school', 'subject', 'hire_date', 'is_active']
@@ -45,3 +55,14 @@ class TeacherAdmin(admin.ModelAdmin):
     def get_user_name(self, obj):
         return obj.user.get_full_name()
     get_user_name.short_description = 'Name'
+
+@admin.register(TeacherAssignment)
+class TeacherAssignmentAdmin(admin.ModelAdmin):
+    list_display = ['teacher', 'student_class', 'subject', 'assigned_date', 'is_active']
+    list_filter = ['student_class__school', 'student_class', 'subject', 'is_active']
+    search_fields = ['teacher__user__first_name', 'teacher__user__last_name', 'subject']
+    fieldsets = (
+        ('Assignment Details', {'fields': ('teacher', 'student_class', 'subject')}),
+        ('Status', {'fields': ('is_active', 'assigned_date')}),
+    )
+    readonly_fields = ('assigned_date',)

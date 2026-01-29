@@ -25,7 +25,11 @@ urlpatterns = [
     path('exams/', include('core.examinations.urls')),
     path('fees/', include('core.fees.urls')),
     path('payments/', include('core.payments.urls')),
+    path('notifications/', include('core.notifications.urls')),
     path('admin-panel/', include('core.adminpanel.urls')),
+    
+    # Parent Portal API
+    path('api/parent/', include('core.payments.parent_urls')),
     
     # Debug endpoint for CSRF configuration (only in DEBUG mode)
     path('debug/csrf-config/', check_csrf_config, name='csrf_config'),

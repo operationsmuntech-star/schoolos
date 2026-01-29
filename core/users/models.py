@@ -114,6 +114,35 @@ class Student(models.Model):
     def __str__(self):
         return f'{self.user.get_full_name()} ({self.registration_number})'
 
+class StudentClass(models.Model):
+    """Class/Grade level in a school"""
+    school = models.ForeignKey(
+        School,
+        on_delete=models.CASCADE,
+        related_name='classes'
+    )
+    name = models.CharField(max_length=50)  # e.g., "Form 1A", "Class 3", "Grade 10"
+    level = models.CharField(max_length=50, blank=True)  # e.g., "Primary", "Secondary"
+    capacity = models.IntegerField(default=40)
+    class_teacher = models.ForeignKey(
+        'Teacher',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='classes_teaching'
+    )
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'student_classes'
+        unique_together = ('school', 'name')
+        ordering = ['level', 'name']
+    
+    def __str__(self):
+        return f"{self.school.name} - {self.name}"
+
+
 class Teacher(models.Model):
     """Teacher profile model"""
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='teacher')
@@ -137,3 +166,27 @@ class Teacher(models.Model):
     
     def __str__(self):
         return f'{self.user.get_full_name()} ({self.subject})'
+
+class TeacherAssignment(models.Model):
+    """Teacher assignment to specific classes and subjects"""
+    teacher = models.ForeignKey(
+        Teacher,
+        on_delete=models.CASCADE,
+        related_name='assignments'
+    )
+    student_class = models.ForeignKey(
+        StudentClass,
+        on_delete=models.CASCADE,
+        related_name='teacher_assignments'
+    )
+    subject = models.CharField(max_length=100)
+    assigned_date = models.DateField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+    
+    class Meta:
+        db_table = 'teacher_assignments'
+        unique_together = ('teacher', 'student_class', 'subject')
+        ordering = ['student_class', 'subject']
+    
+    def __str__(self):
+        return f"{self.teacher.user.get_full_name()} - {self.student_class.name} ({self.subject})"

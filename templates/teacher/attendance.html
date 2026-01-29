@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mark Attendance{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="h3 mb-0"><i class="bi bi-calendar-check"></i> Mark Attendance</h1>
+            <p class="text-muted">Record student attendance for {{ today }}</p>
+        </div>
+    </div>
+
+    <!-- Alert Container -->
+    <div id="alert-container"></div>
+
+    <!-- Class Selection -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <label for="class-select" class="form-label">Select Class</label>
+                    <select id="class-select" class="form-select">
+                        <option value="">Choose a class...</option>
+                        {% for class in classes %}
+                        <option value="{{ class.id }}" {% if selected_class.id == class.id %}selected{% endif %}>
+                            {{ class.name }} ({{ class|length }} students)
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attendance Marking -->
+    {% if selected_class %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{ selected_class.name }} - {{ students|length }} Students</h5>
+                    <div>
+                        <button id="mark-all-present" class="btn btn-sm btn-success me-2">
+                            <i class="bi bi-check-all"></i> All Present
+                        </button>
+                        <button id="mark-all-absent" class="btn btn-sm btn-danger">
+                            <i class="bi bi-x-lg"></i> All Absent
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if students %}
+                    <form id="attendance-form">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Student Name</th>
+                                        <th>Registration</th>
+                                        <th class="text-center">Present</th>
+                                        <th class="text-center">Absent</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for student in students %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ student.user.first_name }} {{ student.user.last_name }}</strong>
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">{{ student.registration_number }}</small>
+                                        </td>
+                                        <td class="text-center">
+                                            <input type="radio" name="student_{{ student.id }}" value="1" class="form-check-input attendance-radio"
+                                                data-student="{{ student.id }}"
+                                                {% if today_attendance|key:student.id %}checked{% endif %}>
+                                        </td>
+                                        <td class="text-center">
+                                            <input type="radio" name="student_{{ student.id }}" value="0" class="form-check-input attendance-radio"
+                                                data-student="{{ student.id }}"
+                                                {% if today_attendance|key:student.id == False %}checked{% endif %}>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg" id="submit-btn">
+                                <i class="bi bi-save"></i> Save Attendance
+                            </button>
+                            <a href="{% url 'dashboard:teacher_dashboard' %}" class="btn btn-outline-secondary btn-lg">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                    {% else %}
+                    <p class="text-muted">No students in this class.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        Select a class above to mark attendance
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    const classSelect = document.getElementById('class-select');
+    const attendanceForm = document.getElementById('attendance-form');
+    const markAllPresentBtn = document.getElementById('mark-all-present');
+    const markAllAbsentBtn = document.getElementById('mark-all-absent');
+
+    // Handle class selection
+    classSelect.addEventListener('change', (e) => {
+        if (e.target.value) {
+            window.location.href = `?class_id=${e.target.value}`;
+        }
+    });
+
+    // Mark all present
+    if (markAllPresentBtn) {
+        markAllPresentBtn.addEventListener('click', () => {
+            document.querySelectorAll('input[type="radio"][value="1"]').forEach(input => {
+                input.checked = true;
+            });
+        });
+    }
+
+    // Mark all absent
+    if (markAllAbsentBtn) {
+        markAllAbsentBtn.addEventListener('click', () => {
+            document.querySelectorAll('input[type="radio"][value="0"]').forEach(input => {
+                input.checked = true;
+            });
+        });
+    }
+
+    // Handle form submission
+    if (attendanceForm) {
+        attendanceForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const classId = '{{ selected_class.id }}';
+            const attendanceData = {};
+            const classIdInput = new URLSearchParams(window.location.search).get('class_id');
+
+            // Collect attendance data
+            document.querySelectorAll('.attendance-radio:checked').forEach(input => {
+                const studentId = input.getAttribute('data-student');
+                attendanceData[studentId] = input.value === '1';
+            });
+
+            try {
+                const response = await fetch('{% url "dashboard:save_attendance" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || getCookie('csrftoken'),
+                    },
+                    body: JSON.stringify({
+                        class_id: classIdInput,
+                        attendance: attendanceData,
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert(`✓ ${result.message}`, 'success');
+                    document.getElementById('submit-btn').innerHTML = '<i class="bi bi-check"></i> Saved!';
+                    document.getElementById('submit-btn').disabled = true;
+                    setTimeout(() => {
+                        window.location.href = '{% url "dashboard:attendance_marking" %}';
+                    }, 2000);
+                } else {
+                    showAlert(`✗ ${result.message}`, 'danger');
+                }
+            } catch (error) {
+                showAlert(`✗ Error: ${error.message}`, 'danger');
+            }
+        });
+    }
+
+    function showAlert(message, type) {
+        const alertContainer = document.getElementById('alert-container');
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${type} alert-dismissible fade show`;
+        alert.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        alertContainer.appendChild(alert);
+        setTimeout(() => alert.remove(), 5000);
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+
+<style>
+    .table-responsive {
+        border-radius: 0.5rem;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .form-check-input {
+        cursor: pointer;
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+</style>
+{% endblock %}
