@@ -12,7 +12,12 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include('backend.api.routers')),
     path('health/', lambda r: __import__('django.http', fromlist=['JsonResponse']).JsonResponse({'status': 'ok'})),
-    # In DEBUG mode we serve frontend files directly from the `frontend` folder
+
+    # --- MOVED SPA HANDLERS HERE (Required for Production) ---
+    # Single entry point: serve SPA index for root and any non-admin/api paths
+    path('', core_views.spa_index, name='spa-index'),
+    # This regex ensures we catch all frontend routes but don't swallow API/Admin calls
+    re_path(r'^(?!admin/|api/|static/|media/|scripts/|styles/|views/|components/|manifest|offline).*$', core_views.spa_index),
 ]
 
 if settings.DEBUG:
@@ -24,9 +29,6 @@ if settings.DEBUG:
         path('components/<path:path>', serve, {'document_root': settings.BASE_DIR / 'frontend' / 'components'}),
         path('manifest.json', serve, {'document_root': settings.BASE_DIR / 'frontend', 'path': 'manifest.json'}),
         path('offline.html', serve, {'document_root': settings.BASE_DIR / 'frontend', 'path': 'offline.html'}),
-        # Single entry point: serve SPA index for root and any non-admin/api paths
-        path('', core_views.spa_index, name='spa-index'),
-        re_path(r'^(?!admin/|api/|static/|media/|scripts/|styles/|views/|components/|manifest|offline).*$', core_views.spa_index),
     ]
 
 if settings.DEBUG:

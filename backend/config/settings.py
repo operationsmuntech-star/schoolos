@@ -122,7 +122,8 @@ STATICFILES_DIRS = [
 
 # Only use compressed storage in production
 if not DEBUG and os.environ.get('DATABASE_URL'):
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    # Use compression but KEEP original filenames (Required for PWA/Service Worker)
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -175,3 +176,8 @@ if not DEBUG and os.environ.get('DATABASE_URL'):
         'script-src': ("'self'", "'unsafe-inline'"),
         'style-src': ("'self'", "'unsafe-inline'"),
     }
+
+# WhiteNoise Root Configuration
+# Allows serving files (like service-worker.js, manifest.json, styles/) from the root URL
+if not DEBUG and os.environ.get('DATABASE_URL'):
+    WHITENOISE_ROOT = BASE_DIR / 'staticfiles'
