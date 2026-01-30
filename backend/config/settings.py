@@ -11,8 +11,15 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dev-key-change-in-pro
 
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-# Allow everyone (Local LAN + Railway)
-ALLOWED_HOSTS = ['*']
+# Allow everyone (Local LAN + Railway) - can be restricted later
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '*.railway.app',  # Railway auto-domain
+    os.environ.get('RAILWAY_DOMAIN', ''),  # Custom Railway domain if set
+    '*'  # Permit all for LAN deployments
+]
+ALLOWED_HOSTS = [h for h in ALLOWED_HOSTS if h]  # Remove empty strings
 
 # Database configuration - supports both SQLite and PostgreSQL
 if os.environ.get('DATABASE_URL'):
@@ -101,6 +108,12 @@ USE_TZ = True
 # Static files configuration
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Include frontend and app directories in static files lookup
+STATICFILES_DIRS = [
+    BASE_DIR / 'frontend',  # Frontend HTML, JS, CSS
+]
+
 # Only use compressed storage in production
 if not DEBUG and os.environ.get('DATABASE_URL'):
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

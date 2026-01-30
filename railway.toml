@@ -1,10 +1,10 @@
 [build]
 builder = "nixpacks"
-buildCommand = "pip install -r requirements.txt && python manage.py collectstatic --noinput"
+buildCommand = "pip install -r requirements.txt && python manage.py collectstatic --noinput --clear"
 
 [deploy]
-startCommand = "python manage.py migrate && gunicorn backend.config.wsgi --bind 0.0.0.0:$PORT"
-healthcheckPath = "/admin/login/"
+startCommand = "python manage.py migrate && gunicorn backend.config.wsgi --bind 0.0.0.0:$PORT --workers 2"
+healthcheckPath = "/health/"
 healthcheckTimeout = 100
 
 [env]
