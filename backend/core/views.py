@@ -6,9 +6,10 @@ from pathlib import Path
 def spa_index(request):
     """Serve the frontend SPA index.html for the single-entry-point app."""
     # Try multiple paths to support local dev and Railway production
+    # Prefer production-collected static first (STATIC_ROOT), then repo frontend folder, then fallback
     paths_to_try = [
-        Path(settings.BASE_DIR) / 'frontend' / 'index.html',  # Local dev
         Path(settings.STATIC_ROOT) / 'index.html',  # Production (collected static)
+        Path(settings.BASE_DIR) / 'frontend' / 'index.html',  # Local dev
         Path(settings.BASE_DIR) / 'staticfiles' / 'index.html',  # Fallback
     ]
     
