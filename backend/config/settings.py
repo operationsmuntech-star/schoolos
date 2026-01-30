@@ -112,27 +112,32 @@ USE_I18N = True
 USE_TZ = True
 
 # Static files configuration
-STATIC_URL = '/static/'
+STATIC_URL = '/'  # Serve static files from root
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Include frontend directory in static files lookup
+# Include all frontend subdirectories in static files lookup
 STATICFILES_DIRS = [
-    BASE_DIR / 'frontend',  # Frontend scripts, styles, views, components
+    BASE_DIR / 'frontend',  # Includes scripts/, styles/, views/, components/, etc.
 ]
 
 # Production static files handling with WhiteNoise
 if not DEBUG and os.environ.get('DATABASE_URL'):
     # Use compression but KEEP original filenames (Required for PWA/Service Worker)
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
-    # WhiteNoise Root: serve frontend files from root URL path
+    # WhiteNoise Root: serve ALL collected files from root URL (not /static/)
     WHITENOISE_ROOT = BASE_DIR / 'staticfiles'
-    # Allow WhiteNoise to compress .json and other files
+    # WhiteNoise will serve index.html fallback for SPA
+    WHITENOISE_AUTOREFRESH = False
+    # Explicit MIME types for frontend assets
     WHITENOISE_MIMETYPES = {
         '.json': 'application/json',
         '.js': 'application/javascript',
         '.css': 'text/css',
+        '.html': 'text/html',
         '.woff': 'font/woff',
         '.woff2': 'font/woff2',
+        '.png': 'image/png',
+        '.svg': 'image/svg+xml',
     }
 
 MEDIA_URL = '/media/'
