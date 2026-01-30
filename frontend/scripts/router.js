@@ -1,53 +1,21 @@
-/**
- * Router - Handle offline-safe routing
- * Phase 0: Skeleton routing for SPA navigation
- */
-const routes = {
-  '/': 'views/dashboard.html',
-  '/dashboard': 'views/dashboard.html',
-  '/attendance': 'views/attendance.html',
-  '/academics': 'views/academics.html',
-  '/settings': 'views/settings.html',
-};
+export function router() {
+  const app = document.getElementById("app");
+  const route = location.hash || "#/dashboard";
 
-class Router {
-  constructor() {
-    this.currentRoute = '/dashboard';
-    this.init();
-  }
+  const routes = {
+    "#/dashboard": "/views/dashboard.html",
+    "#/attendance": "/views/attendance.html",
+    "#/settings": "/views/settings.html",
+  };
 
-  init() {
-    window.addEventListener('hashchange', () => this.navigate());
-    this.navigate();
-  }
+  const view = routes[route] || routes["#/dashboard"];
 
-  navigate(path = null) {
-    const route = path || window.location.hash.slice(1) || '/dashboard';
-    const filePath = routes[route] || routes['/'];
-    this.loadView(filePath);
-  }
+  fetch(view)
+    .then(res => res.text())
+    .then(html => app.innerHTML = html);
+}
 
-  async loadView(filePath) {
-    try {
-      const response = await fetch(filePath);
-      if (response.ok) {
-        const html = await response.text();
-        document.getElementById('app-container').innerHTML = html;
-      } else {
-        this.loadOfflineFallback();
-      }
-    } catch (error) {
-      console.warn('Navigation error, checking cache:', error);
-      this.loadOfflineFallback();
-    }
-  }
-
-  loadOfflineFallback() {
-    const main = document.querySelector('main');
-    if (main) {
-      main.innerHTML = '<p class="p-4 text-center text-gray-600">Content not available offline. Check your connection.</p>';
-    }
-  }
+window.addEventListener("hashchange", router);
 }
 
 // Initialize router

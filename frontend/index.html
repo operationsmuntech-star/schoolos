@@ -1,46 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MunTech School Infra</title>
-<link rel="stylesheet" href="styles/tailwind.css">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#4F46E5">
+  <meta charset="UTF-8" />
+  <title>MunTech School</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="stylesheet" href="/styles/base.css" />
+  <link rel="stylesheet" href="/styles/theme.css" />
 </head>
-<body class="bg-gray-50 text-gray-900 font-sans">
-<div id="app">
-  <header class="bg-white text-gray-800 p-6 flex justify-between items-center border-b">
-    <div class="flex items-center space-x-4">
-      <div class="w-12 h-12 bg-indigo-600 text-white rounded flex items-center justify-center font-bold">M</div>
-      <div>
-        <div class="text-lg font-semibold">MunTech</div>
-        <div class="text-xs text-gray-500">Works with or without internet</div>
-      </div>
-    </div>
-    <div>
-      <a id="registerSchool" href="/views/settings.html" class="text-sm text-indigo-600 hover:underline">Register a school</a>
-    </div>
-  </header>
 
-  <main class="flex items-center justify-center h-[calc(100vh-80px)] p-6">
-    <div class="max-w-xl w-full text-center bg-white p-8 rounded-lg shadow">
-      <h1 class="text-2xl font-bold mb-2">One URL. One app.</h1>
-      <p class="text-gray-600 mb-6">Give your school a single trusted door. Works on phones, tablets and desktops — online or offline.</p>
+<body class="app-shell">
+  <div id="header"></div>
 
-      <div class="flex flex-col sm:flex-row gap-3 justify-center">
-        <button id="signInBtn" class="px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold">Sign in</button>
-        <button id="learnMoreBtn" class="px-6 py-3 bg-gray-100 text-gray-800 rounded-lg">Learn more</button>
-      </div>
+  <div class="app-body">
+    <div id="sidebar"></div>
+    <main id="app"></main>
+  </div>
 
-      <p class="text-xs text-gray-400 mt-6">Installed apps use the same URL. You are not installing separate software.</p>
-    </div>
-  </main>
-</div>
+  <div id="statusbar"></div>
 
-<script src="scripts/db.js"></script>
-<script src="scripts/app.js"></script>
-<script src="scripts/install.js"></script>
-<script src="scripts/gate.js"></script>
+  <script type="module" src="/scripts/app.js"></script>
 </body>
 </html>

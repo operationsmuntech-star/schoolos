@@ -1,32 +1,23 @@
-/**
- * Status Bar Component - Shows sync and connection status
- */
-function createStatusBar() {
-  const statusbar = document.createElement('div');
-  statusbar.className = 'bg-gray-800 text-white p-2 text-xs flex justify-between';
-  statusbar.innerHTML = `
-    <span id="connectionStatus">Offline</span>
-    <span id="syncStatus">No sync pending</span>
-  `;
-  return statusbar;
-}
+export async function loadStatusBar() {
+  const bar = document.getElementById("statusbar");
 
-function updateConnectionStatus(online) {
-  const statusEl = document.getElementById('connectionStatus');
-  if (statusEl) {
-    statusEl.textContent = online ? '🟢 Online' : '🔴 Offline';
-    statusEl.style.color = online ? '#10b981' : '#ef4444';
+  function update() {
+    const online = navigator.onLine;
+    const lastSync = localStorage.getItem("last_sync") || "Never";
+    const pending = localStorage.getItem("pending_sync") || 0;
+
+    bar.innerHTML = `
+      <div class="statusbar">
+        <span class="${online ? "ok" : "warn"}">
+          ${online ? "Online" : "Offline"}
+        </span>
+        <span>Pending: ${pending}</span>
+        <span>Last Sync: ${lastSync}</span>
+      </div>
+    `;
   }
-}
 
-function updateSyncStatus(pendingCount) {
-  const syncEl = document.getElementById('syncStatus');
-  if (syncEl) {
-    syncEl.textContent = pendingCount > 0 ? `⏳ ${pendingCount} pending sync` : '✓ Synced';
-  }
+  update();
+  window.addEventListener("online", update);
+  window.addEventListener("offline", update);
 }
-
-// Export for use in other scripts
-window.createStatusBar = createStatusBar;
-window.updateConnectionStatus = updateConnectionStatus;
-window.updateSyncStatus = updateSyncStatus;

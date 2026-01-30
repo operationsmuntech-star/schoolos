@@ -1,6 +1,12 @@
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/service-worker.js').then(() => console.log('SW registered'));
-}
+import { loadHeader } from "../components/header.js";
+import { loadSidebar } from "../components/sidebar.js";
+import { loadStatusBar } from "../components/statusbar.js";
+import { router } from "./router.js";
 
-window.addEventListener('online', () => document.getElementById('status').textContent = 'Online');
-window.addEventListener('offline', () => document.getElementById('status').textContent = 'Offline');
+document.addEventListener("DOMContentLoaded", async () => {
+  await loadHeader();
+  await loadSidebar();
+  await loadStatusBar();
+
+  router(); // initial route
+});
