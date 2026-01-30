@@ -92,6 +92,21 @@ class TenantAuthManager {
     localStorage.setItem('school_name', data.school.name);
     localStorage.setItem('username', data.user.username);
     localStorage.setItem('last_login', new Date().toISOString());
+    
+    // Persist tenant info into IndexedDB for offline use (non-blocking)
+    try {
+      if (window.db && typeof window.db.updateInStore === 'function') {
+        window.db.updateInStore('appSettings', {
+          id: 'tenant',
+          schoolId: data.school.id,
+          schoolCode: data.school.code,
+          schoolName: data.school.name,
+          savedAt: new Date().toISOString()
+        }).catch(e => console.warn('Could not save tenant to IndexedDB:', e));
+      }
+    } catch (e) {
+      console.warn('IndexedDB tenant save failed:', e);
+    }
   }
 
   async logout() {

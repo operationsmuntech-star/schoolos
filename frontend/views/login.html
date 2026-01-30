@@ -30,9 +30,10 @@
         <span id="errorText"></span>
       </div>
 
-      <!-- School Code -->
-      <div class="mb-5">
-        <label class="block text-sm font-medium text-gray-700 mb-2">School Code</label>
+      <!-- School Code / Resolved School -->
+      <div class="mb-5" id="schoolBlock">
+        <label class="block text-sm font-medium text-gray-700 mb-2">School</label>
+        <div id="resolvedSchool" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-800 hidden"></div>
         <input 
           type="text" 
           id="schoolCode" 
@@ -40,7 +41,8 @@
           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
           required
         >
-        <p class="text-xs text-gray-500 mt-1">Enter your school's unique code</p>
+        <p class="text-xs text-gray-500 mt-1">Enter your school's unique code or choose it from the landing page</p>
+        <div class="mt-2 text-xs text-indigo-600"><a id="changeSchool" href="/">Change school</a></div>
       </div>
 
       <!-- Username -->
@@ -105,6 +107,7 @@
 
   <!-- Scripts -->
   <script src="../scripts/auth.js"></script>
+  <script src="../scripts/gate.js"></script>
   <script>
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -112,7 +115,11 @@
     });
 
     async function handleLogin() {
-      const schoolCode = document.getElementById('schoolCode').value.trim();
+      // Use resolved school if available
+      const resolved = document.getElementById('resolvedSchool');
+      const schoolCode = (resolved && !resolved.classList.contains('hidden'))
+        ? resolved.dataset.code
+        : document.getElementById('schoolCode').value.trim();
       const username = document.getElementById('username').value.trim();
       const password = document.getElementById('password').value;
       const rememberMe = document.getElementById('rememberMe').checked;
@@ -188,6 +195,20 @@
 
     // Pre-fill if remembered
     window.addEventListener('DOMContentLoaded', () => {
+      // If a school was selected on the gate page, use it and hide the input
+      const storedSchoolId = localStorage.getItem('school_id');
+      const storedSchoolCode = localStorage.getItem('school_code');
+      const storedSchoolName = localStorage.getItem('school_name');
+
+      if (storedSchoolCode) {
+        const resolved = document.getElementById('resolvedSchool');
+        const input = document.getElementById('schoolCode');
+        resolved.textContent = storedSchoolName ? `${storedSchoolName} (${storedSchoolCode})` : storedSchoolCode;
+        resolved.dataset.code = storedSchoolCode;
+        resolved.classList.remove('hidden');
+        input.classList.add('hidden');
+      }
+
       const rememberSchool = localStorage.getItem('remember_school');
       const rememberUsername = localStorage.getItem('remember_username');
       

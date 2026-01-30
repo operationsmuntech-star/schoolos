@@ -6,9 +6,11 @@ const urlsToCache = [
   '/styles/base.css',
   '/styles/theme.css',
   '/scripts/app.js',
+  '/scripts/gate.js',
   '/scripts/db.js',
   '/scripts/install.js',
   '/views/dashboard.html',
+  '/views/login.html',
   '/views/attendance.html',
   '/views/academics.html',
   '/views/settings.html'
