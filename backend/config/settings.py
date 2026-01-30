@@ -162,12 +162,15 @@ else:
 
 CORS_ALLOW_CREDENTIALS = True
 
-# Security settings for production (only on Railway with DATABASE_URL)
+# Security settings for production
 if not DEBUG and os.environ.get('DATABASE_URL'):
-    # Tells Django to trust the X-Forwarded-Proto header from Railway's Load Balancer
+    # Trust Railway's Load Balancer
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     
-    SECURE_SSL_REDIRECT = True
+    # DISABLE Internal SSL Redirect (Railway handles this at the edge/domain level)
+    # This ensures the HTTP health check passes.
+    SECURE_SSL_REDIRECT = False
+    
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
@@ -176,6 +179,10 @@ if not DEBUG and os.environ.get('DATABASE_URL'):
         'script-src': ("'self'", "'unsafe-inline'"),
         'style-src': ("'self'", "'unsafe-inline'"),
     }
+
+# Allow all hosts in production (Railway handles routing, this prevents 400 errors on health checks)
+if not DEBUG:
+    ALLOWED_HOSTS = ['*']
 
 # WhiteNoise Root Configuration
 # Allows serving files (like service-worker.js, manifest.json, styles/) from the root URL
