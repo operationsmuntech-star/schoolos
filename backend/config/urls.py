@@ -24,11 +24,10 @@ if settings.DEBUG:
         path('components/<path:path>', serve, {'document_root': settings.BASE_DIR / 'frontend' / 'components'}),
         path('manifest.json', serve, {'document_root': settings.BASE_DIR / 'frontend', 'path': 'manifest.json'}),
         path('offline.html', serve, {'document_root': settings.BASE_DIR / 'frontend', 'path': 'offline.html'}),
+        # Single entry point: serve SPA index for root and any non-admin/api paths
+        path('', core_views.spa_index, name='spa-index'),
+        re_path(r'^(?!admin/|api/|static/|media/|scripts/|styles/|views/|components/|manifest|offline).*$', core_views.spa_index),
     ]
-    # Single entry point: serve SPA index for root and any non-admin/api paths
-    path('', core_views.spa_index, name='spa-index'),
-    re_path(r'^(?!admin/|api/|static/|media/|scripts/|styles/|views/|components/|manifest|offline).*$', core_views.spa_index),
-]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
