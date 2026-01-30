@@ -11,6 +11,7 @@ from backend.attendance.api import (
     AttendanceExceptionViewSet,
     AttendanceReportViewSet
 )
+from backend.api import auth as auth_views
 
 
 @api_view(['GET'])
@@ -31,4 +32,8 @@ router.register(r'attendance/reports', AttendanceReportViewSet, basename='attend
 
 urlpatterns = [
     path('health/', health_check, name='health-check'),
+    # Authentication endpoints
+    path('auth/school-login/', auth_views.school_login, name='school-login'),
+    path('auth/schools/', auth_views.get_schools, name='get-schools'),
+    path('auth/switch-school/', auth_views.switch_school, name='switch-school'),
 ] + router.urls

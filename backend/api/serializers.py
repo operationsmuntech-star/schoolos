@@ -5,6 +5,7 @@ from rest_framework import serializers
 from backend.attendance.models import Attendance, AttendanceSession, AttendanceException
 from backend.people.models import Student, Teacher
 from backend.core.models import Class
+from backend.users.models import User
 
 
 class StudentBasicSerializer(serializers.ModelSerializer):
@@ -146,3 +147,10 @@ class AttendanceReportSerializer(serializers.Serializer):
     late = serializers.IntegerField()
     excused = serializers.IntegerField()
     rate = serializers.FloatField()
+
+
+class UserSerializer(serializers.ModelSerializer):
+    """Basic user serializer for auth responses"""
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'school_id']

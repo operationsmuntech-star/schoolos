@@ -1,7 +1,6 @@
 from django.conf import settings
-from django.http import FileResponse, HttpResponseNotFound, HttpResponse
+from django.http import FileResponse, HttpResponse
 from pathlib import Path
-import os
 
 
 def spa_index(request):
@@ -16,8 +15,10 @@ def spa_index(request):
     for index_path in paths_to_try:
         if index_path.exists():
             try:
-                with open(index_path, 'rb') as f:
-                    return FileResponse(f, content_type='text/html')
+                # FIX: Do not use 'with open(...)'. Open the file and pass the handle directly.
+                # FileResponse closes the file automatically when the request is done.
+                f = open(index_path, 'rb')
+                return FileResponse(f, content_type='text/html')
             except Exception as e:
                 print(f"Error serving {index_path}: {e}")
                 continue

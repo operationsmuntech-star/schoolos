@@ -12,14 +12,20 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dev-key-change-in-pro
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 # Allow everyone (Local LAN + Railway) - can be restricted later
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '*.railway.app',  # Railway auto-domain
-    os.environ.get('RAILWAY_DOMAIN', ''),  # Custom Railway domain if set
-    '*'  # Permit all for LAN deployments
-]
-ALLOWED_HOSTS = [h for h in ALLOWED_HOSTS if h]  # Remove empty strings
+# Tighten ALLOWED_HOSTS: read from env or fallback to sensible defaults
+env_allowed = os.environ.get('ALLOWED_HOSTS')
+if env_allowed:
+    # Allow comma-separated list from environment
+    ALLOWED_HOSTS = [h.strip() for h in env_allowed.split(',') if h.strip()]
+else:
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+    # Prefer explicit Railway domain if provided in env
+    railway_domain = os.environ.get('RAILWAY_DOMAIN')
+    if railway_domain:
+        ALLOWED_HOSTS.append(railway_domain)
+    else:
+        # Allow Railway subdomains when not explicitly set (less permissive than '*')
+        ALLOWED_HOSTS.append('.railway.app')
 
 # Database configuration - supports both SQLite and PostgreSQL
 if os.environ.get('DATABASE_URL'):
@@ -140,12 +146,18 @@ REST_FRAMEWORK = {
 }
 
 # CORS Configuration for PWA and multi-tenant
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
-    "https://*.railway.app",
-]
+cors_env = os.environ.get('CORS_ALLOWED_ORIGINS')
+if cors_env:
+    CORS_ALLOWED_ORIGINS = [o.strip() for o in cors_env.split(',') if o.strip()]
+else:
+    CORS_ALLOWED_ORIGINS = [
+        "http://localhost:3000",
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+    ]
+    # Add Railway domain if provided explicitly
+    if os.environ.get('RAILWAY_DOMAIN'):
+        CORS_ALLOWED_ORIGINS.append(f"https://{os.environ.get('RAILWAY_DOMAIN')}")
 
 CORS_ALLOW_CREDENTIALS = True
 

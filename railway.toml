@@ -10,3 +10,5 @@ healthcheckTimeout = 100
 [env]
 PYTHONUNBUFFERED = "1"
 PORT = "8000"
+# Set your deployed Railway domain here to tighten ALLOWED_HOSTS and CORS
+RAILWAY_DOMAIN = "schoolos.up.railway.app"
