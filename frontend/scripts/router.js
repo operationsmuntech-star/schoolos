@@ -3,9 +3,9 @@ export function router() {
   const route = location.hash || "#/dashboard";
 
   const routes = {
-    "#/dashboard": "/views/dashboard.html",
-    "#/attendance": "/views/attendance.html",
-    "#/settings": "/views/settings.html",
+    "#/dashboard": "/static/views/dashboard.html",
+    "#/attendance": "/static/views/attendance.html",
+    "#/settings": "/static/views/settings.html",
   };
 
   const view = routes[route] || routes["#/dashboard"];
@@ -16,7 +16,3 @@ export function router() {
 }
 
 window.addEventListener("hashchange", router);
-}
-
-// Initialize router
-window.router = new Router();

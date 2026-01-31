@@ -14,25 +14,25 @@ urlpatterns = [
     path('health/', lambda r: __import__('django.http', fromlist=['JsonResponse']).JsonResponse({'status': 'ok'})),
 ]
 
-# Development: serve frontend assets manually
+# Development: serve frontend assets manually via /static/ prefix
 if settings.DEBUG:
     urlpatterns += [
-        path('scripts/<path:path>', serve, {'document_root': settings.BASE_DIR / 'frontend' / 'scripts'}),
-        path('styles/<path:path>', serve, {'document_root': settings.BASE_DIR / 'frontend' / 'styles'}),
-        path('views/<path:path>', serve, {'document_root': settings.BASE_DIR / 'frontend' / 'views'}),
-        path('components/<path:path>', serve, {'document_root': settings.BASE_DIR / 'frontend' / 'components'}),
-        path('manifest.json', serve, {'document_root': settings.BASE_DIR / 'frontend', 'path': 'manifest.json'}),
-        path('offline.html', serve, {'document_root': settings.BASE_DIR / 'frontend', 'path': 'offline.html'}),
+        path('static/scripts/<path:path>', serve, {'document_root': settings.BASE_DIR / 'frontend' / 'scripts'}),
+        path('static/styles/<path:path>', serve, {'document_root': settings.BASE_DIR / 'frontend' / 'styles'}),
+        path('static/views/<path:path>', serve, {'document_root': settings.BASE_DIR / 'frontend' / 'views'}),
+        path('static/components/<path:path>', serve, {'document_root': settings.BASE_DIR / 'frontend' / 'components'}),
+        path('static/manifest.json', serve, {'document_root': settings.BASE_DIR / 'frontend', 'path': 'manifest.json'}),
+        path('static/offline.html', serve, {'document_root': settings.BASE_DIR / 'frontend', 'path': 'offline.html'}),
     ]
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 else:
-    # Production: WhiteNoise serves all static files from root
+    # Production: WhiteNoise serves all static files from /static/
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # SPA routes - LAST (catch-all for everything else)
 urlpatterns += [
     path('', core_views.spa_index, name='spa-index'),
-    re_path(r'^(?!admin/|api/|health/|media/).*$', core_views.spa_index),
+    re_path(r'^(?!admin/|api/|health/|static/|media/).*$', core_views.spa_index),
 ]
 
