@@ -11,25 +11,18 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dev-key-change-in-pro
 
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-# Allow everyone (Local LAN + Railway) - can be restricted later
-# Tighten ALLOWED_HOSTS: read from env or fallback to sensible defaults
-env_allowed = os.environ.get('ALLOWED_HOSTS')
-if env_allowed:
-    # Allow comma-separated list from environment
-    ALLOWED_HOSTS = [h.strip() for h in env_allowed.split(',') if h.strip()]
+# ALLOWED_HOSTS Configuration
+# In production, we allow '*' because Railway handles routing and the internal
+# health check uses a hostname that we cannot predict.
+if not DEBUG:
+    ALLOWED_HOSTS = ['*']
 else:
-    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
-    # Prefer explicit Railway domain if provided in env
-    railway_domain = os.environ.get('RAILWAY_DOMAIN')
-    if railway_domain:
-        ALLOWED_HOSTS.append(railway_domain)
-    else:
-        # Allow Railway subdomains when not explicitly set (less permissive than '*')
-        ALLOWED_HOSTS.append('.railway.app')
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.railway.app']
+    if os.environ.get('RAILWAY_DOMAIN'):
+        ALLOWED_HOSTS.append(os.environ.get('RAILWAY_DOMAIN'))
 
-# Database configuration - supports both SQLite and PostgreSQL
+# Database configuration
 if os.environ.get('DATABASE_URL'):
-    # Railway PostgreSQL connection
     import dj_database_url
     DATABASES = {
         'default': dj_database_url.config(
@@ -39,7 +32,6 @@ if os.environ.get('DATABASE_URL'):
         )
     }
 else:
-    # Local SQLite fallback
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -67,6 +59,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', # Critical: Must be here
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -74,10 +67,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
-# Add WhiteNoise only in production (Gunicorn/Railway)
-if not DEBUG and os.environ.get('DATABASE_URL'):
-    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 
 ROOT_URLCONF = 'backend.config.urls'
 
@@ -111,77 +100,50 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static files configuration
+# Static Files (WhiteNoise Configuration)
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+# Where Django looks for static files during development
+STATICFILES_DIRS = [BASE_DIR / 'frontend']
 
-# Include all frontend subdirectories in static files lookup
-STATICFILES_DIRS = [
-    BASE_DIR / 'frontend',  # Includes scripts/, styles/, views/, components/, etc.
-]
+# PWA Support: Serve files from root if not found in /static/
+# This allows serving /service-worker.js and /manifest.json directly
+WHITENOISE_ROOT = BASE_DIR / 'staticfiles'
 
-# Production static files handling with WhiteNoise
 if not DEBUG and os.environ.get('DATABASE_URL'):
     # Use compression but KEEP original filenames (Required for PWA/Service Worker)
+    # The 'Manifest' storage renames files (app.js -> app.123.js), which breaks your HTML imports.
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
-    # Explicit MIME types for frontend assets
-    WHITENOISE_MIMETYPES = {
-        '.json': 'application/json',
-        '.js': 'application/javascript',
-        '.css': 'text/css',
-        '.html': 'text/html',
-        '.woff': 'font/woff',
-        '.woff2': 'font/woff2',
-        '.png': 'image/png',
-        '.svg': 'image/svg+xml',
-    }
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# REST Framework Configuration
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 100,
-    'DEFAULT_FILTER_BACKENDS': [
-        'rest_framework.filters.SearchFilter',
-        'rest_framework.filters.OrderingFilter'
-    ],
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
+    'DEFAULT_FILTER_BACKENDS': ['rest_framework.filters.SearchFilter', 'rest_framework.filters.OrderingFilter'],
+    'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework_simplejwt.authentication.JWTAuthentication'],
+    'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAuthenticated'],
 }
 
-# CORS Configuration for PWA and multi-tenant
+# CORS Configuration
 cors_env = os.environ.get('CORS_ALLOWED_ORIGINS')
 if cors_env:
     CORS_ALLOWED_ORIGINS = [o.strip() for o in cors_env.split(',') if o.strip()]
 else:
-    CORS_ALLOWED_ORIGINS = [
-        "http://localhost:3000",
-        "http://localhost:8000",
-        "http://127.0.0.1:8000",
-    ]
-    # Add Railway domain if provided explicitly
+    CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "http://localhost:8000", "http://127.0.0.1:8000"]
     if os.environ.get('RAILWAY_DOMAIN'):
         CORS_ALLOWED_ORIGINS.append(f"https://{os.environ.get('RAILWAY_DOMAIN')}")
 
 CORS_ALLOW_CREDENTIALS = True
 
-# Security settings for production
+# Security Settings
 if not DEBUG and os.environ.get('DATABASE_URL'):
-    # Trust Railway's Load Balancer
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    
-    # DISABLE Internal SSL Redirect (Railway handles this at the edge/domain level)
-    # This ensures the HTTP health check passes.
+    # CRITICAL: Disable SSL Redirect so internal Health Checks (HTTP) pass
     SECURE_SSL_REDIRECT = False
-    
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
@@ -190,12 +152,5 @@ if not DEBUG and os.environ.get('DATABASE_URL'):
         'script-src': ("'self'", "'unsafe-inline'"),
         'style-src': ("'self'", "'unsafe-inline'"),
     }
+"""
 
-# Allow all hosts in production (Railway handles routing, this prevents 400 errors on health checks)
-if not DEBUG:
-    ALLOWED_HOSTS = ['*']
-
-# WhiteNoise Root Configuration
-# Allows serving files (like service-worker.js, manifest.json, styles/) from the root URL
-if not DEBUG and os.environ.get('DATABASE_URL'):
-    WHITENOISE_ROOT = BASE_DIR / 'staticfiles'
