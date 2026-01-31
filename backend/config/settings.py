@@ -152,5 +152,3 @@ if not DEBUG and os.environ.get('DATABASE_URL'):
         'script-src': ("'self'", "'unsafe-inline'"),
         'style-src': ("'self'", "'unsafe-inline'"),
     }
-"""
-
