@@ -2,8 +2,11 @@ const Auth = {
     init: () => {
         const loginForm = document.getElementById('login-form');
         
-        // 1. TRUST: If on login page, show the school name immediately
         if (loginForm) {
+            // NEW: If we are on /login but don't know the school, go to Gate
+            const school = Gate.verifyContext();
+            if (!school) return; // Stop execution, verifyContext handles redirect
+
             Auth.renderSchoolIdentity();
             loginForm.addEventListener('submit', Auth.handleLogin);
         }

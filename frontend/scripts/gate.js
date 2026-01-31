@@ -60,6 +60,17 @@ const Gate = {
         }
     },
 
+    // NEW: Security check for direct URL entry
+    verifyContext: () => {
+        const cachedSchool = localStorage.getItem('school_context');
+        if (!cachedSchool) {
+            console.warn("Gate: No school context found. Redirecting to resolution.");
+            window.Router.navigate('/'); // Send them to the Gate
+            return false;
+        }
+        return JSON.parse(cachedSchool);
+    },
+
     // UX Helper: Allow user to "break" the cache if they are in the wrong school
     clearAndReset: (e) => {
         if(e) e.preventDefault();
