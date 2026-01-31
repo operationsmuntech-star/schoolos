@@ -3,12 +3,17 @@ const Gate = {
         // 1. Auto-Skip: If we already know the school, go to login
         const cachedSchool = localStorage.getItem('school_context');
         if (cachedSchool) {
-            console.log('Gate: School cached, skipping to login.');
-            window.Router.navigate('/login');
+            // Check if we are ALREADY at login to avoid loops
+            if (!window.location.pathname.includes('/login')) {
+                console.log('Gate: School cached, skipping to login.');
+                // Use Router if available, else hard redirect
+                if (window.Router) window.Router.navigate('/login');
+                else window.location.href = '/login';
+            }
             return;
         }
 
-        // 2. If not, bind the resolution form
+        // 2. Bind the resolution form if it exists
         const form = document.getElementById('school-resolution-form');
         if (form) {
             form.addEventListener('submit', Gate.handleResolution);
@@ -29,8 +34,6 @@ const Gate = {
             submitBtn.disabled = true;
             submitBtn.textContent = 'Searching...';
             
-            // Call API to resolve tenant
-            // NOTE: In production, this hits your Django /api/v1/core/resolve/ endpoint
             const response = await fetch(`${App.API_URL}/core/resolve/?slug=${slug}`);
             
             if (!response.ok) {
@@ -39,45 +42,48 @@ const Gate = {
 
             const data = await response.json();
 
-            // 3. Cache the Identity (The "Trust" Asset)
             const schoolContext = {
                 id: data.tenant_id,
-                name: data.name, // Ensure your API returns 'name'
+                name: data.name,
                 slug: slug,
                 resolvedAt: Date.now()
             };
             
             localStorage.setItem('school_context', JSON.stringify(schoolContext));
             
-            // 4. Redirect
-            window.Router.navigate('/login');
+            // Redirect using Router or Fallback
+            if (window.Router) window.Router.navigate('/login');
+            else window.location.href = '/login';
 
         } catch (error) {
-            errorDiv.classList.remove('hidden');
-            errorMsg.textContent = error.message;
+            if (errorDiv) {
+                errorDiv.classList.remove('hidden');
+                errorMsg.textContent = error.message;
+            }
             submitBtn.disabled = false;
             submitBtn.textContent = 'Continue';
         }
     },
 
-    // NEW: Security check for direct URL entry
+    // SECURITY CHECK: Use this in Auth.js
     verifyContext: () => {
         const cachedSchool = localStorage.getItem('school_context');
         if (!cachedSchool) {
-            console.warn("Gate: No school context found. Redirecting to resolution.");
-            window.Router.navigate('/'); // Send them to the Gate
+            console.warn("Gate: Stranger detected. Hard redirecting to Gate.");
+            // FIX: Use hard redirect to prevent Router crashes
+            window.location.href = '/'; 
             return false;
         }
         return JSON.parse(cachedSchool);
     },
 
-    // UX Helper: Allow user to "break" the cache if they are in the wrong school
     clearAndReset: (e) => {
         if(e) e.preventDefault();
         if (confirm("Are you sure you want to switch schools?")) {
             localStorage.removeItem('school_context');
-            localStorage.removeItem('auth_token'); // Clear auth too
-            window.Router.navigate('/'); // Back to Gate
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('token_expiry');
+            window.location.href = '/';
         }
     }
 };

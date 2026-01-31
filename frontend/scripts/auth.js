@@ -3,16 +3,17 @@ const Auth = {
         const loginForm = document.getElementById('login-form');
         
         if (loginForm) {
-            // NEW: If we are on /login but don't know the school, go to Gate
-            const school = Gate.verifyContext();
-            if (!school) return; // Stop execution, verifyContext handles redirect
+            // 1. SECURITY: Check if we know the school.
+            // If Gate is missing or context is missing, stop execution.
+            if (window.Gate && !Gate.verifyContext()) {
+                return; // Stop here, Gate.verifyContext() handles the redirect
+            }
 
             Auth.renderSchoolIdentity();
             loginForm.addEventListener('submit', Auth.handleLogin);
         }
     },
 
-    // Inject cached school name into the UI
     renderSchoolIdentity: () => {
         const cachedStr = localStorage.getItem('school_context');
         const container = document.getElementById('school-identity-container');
@@ -21,9 +22,8 @@ const Auth = {
 
         if (cachedStr && container && nameDisplay) {
             const context = JSON.parse(cachedStr);
-            nameDisplay.textContent = context.name; // "Joyland Academy"
+            nameDisplay.textContent = context.name;
             
-            // Swap Generic Title for Specific Trust Signal
             if(generic) generic.classList.add('hidden');
             container.classList.remove('hidden');
         }
@@ -32,7 +32,6 @@ const Auth = {
     handleLogin: async (e) => {
         e.preventDefault();
         
-        // 2. OFFLINE GUARD: Check connectivity first
         if (!navigator.onLine) {
             return Auth.handleOfflineLoginAttempt(e);
         }
@@ -43,14 +42,8 @@ const Auth = {
         const errorMsg = document.getElementById('error-message');
         const submitBtn = e.target.querySelector('button');
 
-        // Get context for multi-tenancy
         const context = JSON.parse(localStorage.getItem('school_context'));
-        if (!context) {
-            // Safety valve: if no school context, force back to gate
-            window.Router.navigate('/');
-            return;
-        }
-
+        
         try {
             submitBtn.disabled = true;
             submitBtn.textContent = 'Verifying...';
@@ -59,7 +52,7 @@ const Auth = {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-School-ID': context.id // Critical: Tenant Header
+                    'X-School-ID': context.id
                 },
                 body: JSON.stringify({ username, password })
             });
@@ -69,11 +62,11 @@ const Auth = {
             }
 
             const data = await response.json();
-            
-            // 3. Store Session Data (Token + Expiry)
             Auth.saveSession(data.access, data.refresh);
 
-            window.Router.navigate('/dashboard');
+            // Use window.Router if available, else hard redirect
+            if (window.Router) window.Router.navigate('/dashboard');
+            else window.location.href = '/dashboard';
 
         } catch (error) {
             errorDiv.classList.remove('hidden');
@@ -86,52 +79,40 @@ const Auth = {
     saveSession: (access, refresh) => {
         localStorage.setItem('auth_token', access);
         localStorage.setItem('refresh_token', refresh);
-        
-        // Decode JWT to get real expiry (simple base64 decode for client-side check)
         try {
             const payload = JSON.parse(atob(access.split('.')[1]));
-            localStorage.setItem('token_expiry', payload.exp * 1000); // Store as ms
+            localStorage.setItem('token_expiry', payload.exp * 1000);
         } catch (e) {
-            // Fallback: 24 hours if decode fails
             localStorage.setItem('token_expiry', Date.now() + 86400000);
         }
     },
 
-    // The "Monday Morning" Logic
     handleOfflineLoginAttempt: (e) => {
-        // If offline, we can't verify credentials against DB.
-        // We check if a VALID token already exists.
         const token = localStorage.getItem('auth_token');
         const expiry = localStorage.getItem('token_expiry');
         const errorDiv = document.getElementById('login-error');
         const errorMsg = document.getElementById('error-message');
 
         if (token && expiry && Date.now() < parseInt(expiry)) {
-            // Token is theoretically valid. Allow entry to App Shell.
-            console.log('Auth: Offline but session valid. Allowing entry.');
-            window.Router.navigate('/dashboard');
+            console.log('Auth: Offline entry allowed.');
+            if (window.Router) window.Router.navigate('/dashboard');
+            else window.location.href = '/dashboard';
         } else {
-            // Token expired or missing. Block entry.
             errorDiv.classList.remove('hidden');
-            errorMsg.textContent = "You are offline and your session has expired. Please connect to the internet to log in again.";
+            errorMsg.textContent = "Offline: Session expired. Connect to internet.";
         }
     },
 
-    // Called by Router to protect pages
     isAuthenticated: () => {
         const token = localStorage.getItem('auth_token');
         const expiry = localStorage.getItem('token_expiry');
-        
-        // Simple check: Do we have a token and is it not expired?
         if (!token || !expiry) return false;
         return Date.now() < parseInt(expiry);
     },
 
     logout: () => {
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('refresh_token');
-        localStorage.removeItem('token_expiry');
-        window.Router.navigate('/login');
+        localStorage.clear(); // Wipe everything
+        window.location.href = '/';
     }
 };
 
