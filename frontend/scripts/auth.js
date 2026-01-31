@@ -1,333 +1,135 @@
-/**
- * Multi-Tenant Authentication Module
- * Handles school login, token management, tenant context
- */
-
-class TenantAuthManager {
-  constructor() {
-    this.apiBase = '/api/v1';
-    this.currentSchool = null;
-    this.currentUser = null;
-    this.accessToken = null;
-    this.refreshToken = null;
-    this.init();
-  }
-
-  init() {
-    console.log('🔐 TenantAuthManager initialized');
-    this.loadStoredAuth();
-    this.setupInterceptors();
-  }
-
-  loadStoredAuth() {
-    /**Load authentication from localStorage*/
-    this.accessToken = localStorage.getItem('access_token');
-    this.refreshToken = localStorage.getItem('refresh_token');
-    
-    const schoolId = localStorage.getItem('school_id');
-    const schoolCode = localStorage.getItem('school_code');
-    const schoolName = localStorage.getItem('school_name');
-    const username = localStorage.getItem('username');
-
-    if (schoolId && schoolCode) {
-      this.currentSchool = {
-        id: parseInt(schoolId),
-        code: schoolCode,
-        name: schoolName,
-      };
-    }
-
-    if (username) {
-      this.currentUser = { username };
-    }
-
-    console.log('📍 Tenant loaded:', this.currentSchool?.code);
-  }
-
-  async login(schoolCode, username, password) {
-    /**Login to specific school"""
-    try {
-      const response = await fetch(`${this.apiBase}/auth/school-login/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
-        },
-        body: JSON.stringify({
-          school_code: schoolCode,
-          username: username,
-          password: password,
-        }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Login failed');
-      }
-
-      const data = await response.json();
-
-      // Store tokens and tenant info
-      this.storeAuth(data);
-
-      console.log('✅ Login successful for school:', schoolCode);
-      return data;
-    } catch (error) {
-      console.error('❌ Login error:', error);
-      throw error;
-    }
-  }
-
-  storeAuth(data) {
-    /**Store authentication data"""
-    this.accessToken = data.access;
-    this.refreshToken = data.refresh;
-    this.currentSchool = data.school;
-    this.currentUser = data.user;
-
-    localStorage.setItem('access_token', data.access);
-    localStorage.setItem('refresh_token', data.refresh);
-    localStorage.setItem('school_id', data.school.id);
-    localStorage.setItem('school_code', data.school.code);
-    localStorage.setItem('school_name', data.school.name);
-    localStorage.setItem('username', data.user.username);
-    localStorage.setItem('last_login', new Date().toISOString());
-    
-    // Persist tenant info into IndexedDB for offline use (non-blocking)
-    try {
-      if (window.db && typeof window.db.updateInStore === 'function') {
-        window.db.updateInStore('appSettings', {
-          id: 'tenant',
-          schoolId: data.school.id,
-          schoolCode: data.school.code,
-          schoolName: data.school.name,
-          savedAt: new Date().toISOString()
-        }).catch(e => console.warn('Could not save tenant to IndexedDB:', e));
-      }
-    } catch (e) {
-      console.warn('IndexedDB tenant save failed:', e);
-    }
-  }
-
-  async logout() {
-    /**Logout and clear stored data"""
-    try {
-      await fetch(`${this.apiBase}/auth/logout/`, {
-        method: 'POST',
-        headers: this.getHeaders(),
-      });
-    } catch (e) {
-      console.warn('Logout request failed:', e);
-    }
-
-    this.clearAuth();
-    window.location.href = '/login';
-  }
-
-  clearAuth() {
-    /**Clear all authentication data"""
-    this.accessToken = null;
-    this.refreshToken = null;
-    this.currentSchool = null;
-    this.currentUser = null;
-
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    localStorage.removeItem('school_id');
-    localStorage.removeItem('school_code');
-    localStorage.removeItem('school_name');
-    localStorage.removeItem('username');
-  }
-
-  isAuthenticated() {
-    /**Check if user is authenticated"""
-    return !!this.accessToken && !!this.currentSchool;
-  }
-
-  getSchoolId() {
-    /**Get current school ID"""
-    return this.currentSchool?.id;
-  }
-
-  getSchoolCode() {
-    /**Get current school code"""
-    return this.currentSchool?.code;
-  }
-
-  getUsername() {
-    /**Get current username"""
-    return this.currentUser?.username;
-  }
-
-  getHeaders() {
-    /**Get headers with authentication token"""
-    const headers = {
-      'Content-Type': 'application/json',
-      'X-Requested-With': 'XMLHttpRequest',
-    };
-
-    if (this.accessToken) {
-      headers['Authorization'] = `Bearer ${this.accessToken}`;
-    }
-
-    return headers;
-  }
-
-  setupInterceptors() {
-    /**Setup fetch interceptors for automatic token injection"""
-    const originalFetch = window.fetch;
-
-    window.fetch = async (...args) => {
-      let [resource, config] = args;
-
-      // Only add auth headers to same-origin requests
-      if (typeof resource === 'string' && (
-        resource.startsWith('/api') || 
-        resource.startsWith('http://' + window.location.host) ||
-        resource.startsWith('https://' + window.location.host)
-      )) {
-        config = config || {};
-        config.headers = config.headers || {};
-
-        // Add tenant headers
-        if (this.currentSchool) {
-          config.headers['X-School-Id'] = this.currentSchool.id;
-        }
-
-        // Add auth token
-        if (this.accessToken) {
-          config.headers['Authorization'] = `Bearer ${this.accessToken}`;
-        }
-      }
-
-      let response = await originalFetch(resource, config);
-
-      // Handle token expiration
-      if (response.status === 401) {
-        console.log('⏰ Token expired, attempting refresh...');
+const Auth = {
+    init: () => {
+        const loginForm = document.getElementById('login-form');
         
-        if (this.refreshToken) {
-          const refreshed = await this.refreshAccessToken();
-          if (refreshed) {
-            // Retry original request
-            config.headers['Authorization'] = `Bearer ${this.accessToken}`;
-            response = await originalFetch(resource, config);
-          }
+        // 1. TRUST: If on login page, show the school name immediately
+        if (loginForm) {
+            Auth.renderSchoolIdentity();
+            loginForm.addEventListener('submit', Auth.handleLogin);
+        }
+    },
+
+    // Inject cached school name into the UI
+    renderSchoolIdentity: () => {
+        const cachedStr = localStorage.getItem('school_context');
+        const container = document.getElementById('school-identity-container');
+        const generic = document.getElementById('generic-identity');
+        const nameDisplay = document.getElementById('school-name-display');
+
+        if (cachedStr && container && nameDisplay) {
+            const context = JSON.parse(cachedStr);
+            nameDisplay.textContent = context.name; // "Joyland Academy"
+            
+            // Swap Generic Title for Specific Trust Signal
+            if(generic) generic.classList.add('hidden');
+            container.classList.remove('hidden');
+        }
+    },
+
+    handleLogin: async (e) => {
+        e.preventDefault();
+        
+        // 2. OFFLINE GUARD: Check connectivity first
+        if (!navigator.onLine) {
+            return Auth.handleOfflineLoginAttempt(e);
         }
 
-        if (response.status === 401) {
-          // Refresh failed, logout
-          this.clearAuth();
-          window.location.href = '/login';
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const errorDiv = document.getElementById('login-error');
+        const errorMsg = document.getElementById('error-message');
+        const submitBtn = e.target.querySelector('button');
+
+        // Get context for multi-tenancy
+        const context = JSON.parse(localStorage.getItem('school_context'));
+        if (!context) {
+            // Safety valve: if no school context, force back to gate
+            window.Router.navigate('/');
+            return;
         }
-      }
 
-      return response;
-    };
+        try {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Verifying...';
 
-    console.log('🔗 Fetch interceptors configured');
-  }
+            const response = await fetch(`${App.API_URL}/token/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-School-ID': context.id // Critical: Tenant Header
+                },
+                body: JSON.stringify({ username, password })
+            });
 
-  async refreshAccessToken() {
-    /**Refresh access token using refresh token"""
-    try {
-      const response = await fetch('/api/token/refresh/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          refresh: this.refreshToken,
-        }),
-      });
+            if (!response.ok) {
+                throw new Error('Invalid credentials');
+            }
 
-      if (!response.ok) {
-        return false;
-      }
+            const data = await response.json();
+            
+            // 3. Store Session Data (Token + Expiry)
+            Auth.saveSession(data.access, data.refresh);
 
-      const data = await response.json();
-      this.accessToken = data.access;
-      localStorage.setItem('access_token', data.access);
+            window.Router.navigate('/dashboard');
 
-      console.log('✅ Token refreshed');
-      return true;
-    } catch (error) {
-      console.error('❌ Token refresh failed:', error);
-      return false;
+        } catch (error) {
+            errorDiv.classList.remove('hidden');
+            errorMsg.textContent = error.message;
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Sign in';
+        }
+    },
+
+    saveSession: (access, refresh) => {
+        localStorage.setItem('auth_token', access);
+        localStorage.setItem('refresh_token', refresh);
+        
+        // Decode JWT to get real expiry (simple base64 decode for client-side check)
+        try {
+            const payload = JSON.parse(atob(access.split('.')[1]));
+            localStorage.setItem('token_expiry', payload.exp * 1000); // Store as ms
+        } catch (e) {
+            // Fallback: 24 hours if decode fails
+            localStorage.setItem('token_expiry', Date.now() + 86400000);
+        }
+    },
+
+    // The "Monday Morning" Logic
+    handleOfflineLoginAttempt: (e) => {
+        // If offline, we can't verify credentials against DB.
+        // We check if a VALID token already exists.
+        const token = localStorage.getItem('auth_token');
+        const expiry = localStorage.getItem('token_expiry');
+        const errorDiv = document.getElementById('login-error');
+        const errorMsg = document.getElementById('error-message');
+
+        if (token && expiry && Date.now() < parseInt(expiry)) {
+            // Token is theoretically valid. Allow entry to App Shell.
+            console.log('Auth: Offline but session valid. Allowing entry.');
+            window.Router.navigate('/dashboard');
+        } else {
+            // Token expired or missing. Block entry.
+            errorDiv.classList.remove('hidden');
+            errorMsg.textContent = "You are offline and your session has expired. Please connect to the internet to log in again.";
+        }
+    },
+
+    // Called by Router to protect pages
+    isAuthenticated: () => {
+        const token = localStorage.getItem('auth_token');
+        const expiry = localStorage.getItem('token_expiry');
+        
+        // Simple check: Do we have a token and is it not expired?
+        if (!token || !expiry) return false;
+        return Date.now() < parseInt(expiry);
+    },
+
+    logout: () => {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('refresh_token');
+        localStorage.removeItem('token_expiry');
+        window.Router.navigate('/login');
     }
-  }
+};
 
-  async switchSchool(schoolId) {
-    /**Switch active school (admin only)"""
-    try {
-      const response = await fetch(`${this.apiBase}/auth/switch-school/`, {
-        method: 'POST',
-        headers: this.getHeaders(),
-        body: JSON.stringify({ school_id: schoolId }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to switch school');
-      }
-
-      const data = await response.json();
-      this.currentSchool = data.school;
-      localStorage.setItem('school_id', data.school.id);
-      localStorage.setItem('school_code', data.school.code);
-
-      console.log('🔄 Switched to school:', data.school.code);
-      window.location.reload();
-      return data;
-    } catch (error) {
-      console.error('❌ School switch failed:', error);
-      throw error;
-    }
-  }
-
-  async getAvailableSchools() {
-    /**Get schools user has access to"""
-    try {
-      const response = await fetch(`${this.apiBase}/auth/schools/`, {
-        headers: this.getHeaders(),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch schools');
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('❌ Failed to get schools:', error);
-      return [];
-    }
-  }
-
-  getTenantContext() {
-    /**Get full tenant context for UI"""
-    return {
-      schoolId: this.getSchoolId(),
-      schoolCode: this.getSchoolCode(),
-      schoolName: this.currentSchool?.name,
-      username: this.getUsername(),
-      isAuthenticated: this.isAuthenticated(),
-    };
-  }
-
-  redirectIfNotAuthenticated() {
-    /**Redirect to login if not authenticated"""
-    if (!this.isAuthenticated()) {
-      window.location.href = '/login';
-    }
-  }
-}
-
-// Initialize globally
-window.authManager = new TenantAuthManager();
-
-// Redirect if not authenticated when page loads
-document.addEventListener('DOMContentLoaded', () => {
-  // Only check on non-login pages
-  if (!window.location.pathname.includes('/login')) {
-    window.authManager.redirectIfNotAuthenticated();
-  }
-});
+window.Auth = Auth;

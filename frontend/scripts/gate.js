@@ -1,49 +1,74 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const signInBtn = document.getElementById('signInBtn');
-
-  if (!signInBtn) return;
-
-  signInBtn.addEventListener('click', () => {
-    // Open a small school-resolution prompt (simple flow): prompt for code or name
-    const input = prompt('Enter your School Code (e.g. JPA-001) or School Name');
-    if (!input) return;
-
-    // Basic heuristic: if looks like code, set code; otherwise set name
-    const isCode = /^[A-Z0-9\-]{3,20}$/i.test(input.trim());
-
-    // Try to resolve via API; fallback to using provided text as code
-    const q = encodeURIComponent(input.trim());
-    fetch(`/api/v1/schools/?q=${q}`)
-      .then(r => r.ok ? r.json() : Promise.reject())
-      .then(results => {
-        if (Array.isArray(results) && results.length === 1) {
-          const school = results[0];
-          localStorage.setItem('school_id', school.id);
-          localStorage.setItem('school_code', school.code);
-          localStorage.setItem('school_name', school.name);
-          // Go to login, login view will pick up the stored school
-          window.location.href = '/views/login.html';
-        } else if (Array.isArray(results) && results.length > 1) {
-          // If multiple, pick first for now
-          const school = results[0];
-          localStorage.setItem('school_id', school.id);
-          localStorage.setItem('school_code', school.code);
-          localStorage.setItem('school_name', school.name);
-          window.location.href = '/views/login.html';
-        } else {
-          // Fallback: treat input as school code
-          localStorage.setItem('school_code', input.trim());
-          localStorage.removeItem('school_id');
-          localStorage.removeItem('school_name');
-          window.location.href = '/views/login.html';
+const Gate = {
+    init: async () => {
+        // 1. Auto-Skip: If we already know the school, go to login
+        const cachedSchool = localStorage.getItem('school_context');
+        if (cachedSchool) {
+            console.log('Gate: School cached, skipping to login.');
+            window.Router.navigate('/login');
+            return;
         }
-      })
-      .catch(() => {
-        // Network or API not available — still allow entering school code at login
-        localStorage.setItem('school_code', input.trim());
-        localStorage.removeItem('school_id');
-        localStorage.removeItem('school_name');
-        window.location.href = '/views/login.html';
-      });
-  });
-});
+
+        // 2. If not, bind the resolution form
+        const form = document.getElementById('school-resolution-form');
+        if (form) {
+            form.addEventListener('submit', Gate.handleResolution);
+        }
+    },
+
+    handleResolution: async (e) => {
+        e.preventDefault();
+        const slugInput = document.getElementById('school-slug');
+        const errorDiv = document.getElementById('resolution-error');
+        const errorMsg = document.getElementById('error-message');
+        const submitBtn = e.target.querySelector('button');
+
+        const slug = slugInput.value.trim();
+        if (!slug) return;
+
+        try {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Searching...';
+            
+            // Call API to resolve tenant
+            // NOTE: In production, this hits your Django /api/v1/core/resolve/ endpoint
+            const response = await fetch(`${App.API_URL}/core/resolve/?slug=${slug}`);
+            
+            if (!response.ok) {
+                throw new Error('School not found. Please check the ID.');
+            }
+
+            const data = await response.json();
+
+            // 3. Cache the Identity (The "Trust" Asset)
+            const schoolContext = {
+                id: data.tenant_id,
+                name: data.name, // Ensure your API returns 'name'
+                slug: slug,
+                resolvedAt: Date.now()
+            };
+            
+            localStorage.setItem('school_context', JSON.stringify(schoolContext));
+            
+            // 4. Redirect
+            window.Router.navigate('/login');
+
+        } catch (error) {
+            errorDiv.classList.remove('hidden');
+            errorMsg.textContent = error.message;
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Continue';
+        }
+    },
+
+    // UX Helper: Allow user to "break" the cache if they are in the wrong school
+    clearAndReset: (e) => {
+        if(e) e.preventDefault();
+        if (confirm("Are you sure you want to switch schools?")) {
+            localStorage.removeItem('school_context');
+            localStorage.removeItem('auth_token'); // Clear auth too
+            window.Router.navigate('/'); // Back to Gate
+        }
+    }
+};
+
+window.Gate = Gate;
